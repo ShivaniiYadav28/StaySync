@@ -13,77 +13,127 @@ import AuthProvider from "./context/AuthContext.jsx";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 import Properties from "./pages/Properties";
 import PropertyDetails from "./pages/PropertyDetails";
+
 import AddProperty from "./pages/AddProperty";
 import MyProperties from "./pages/MyProperties";
+import OwnerInquiries from "./pages/OwnerInquiries";
+
+import Favorites from "./pages/Favorites";
+import MyInquiries from "./pages/MyInquiries";
+
+import Messages from "./pages/Messages";
+
+import "./App.css";
+
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <AuthProvider>
 
         <Navbar />
 
-        <Routes>
+        <main>
 
-          {/* ==========================
-              PUBLIC ROUTES
-          ========================== */}
+          <Routes>
 
-          <Route
-            path="/"
-            element={<HomePage />}
-          />
-
-          <Route
-            path="/login"
-            element={<Login />}
-          />
-
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-
-          <Route
-            path="/properties"
-            element={<Properties />}
-          />
-
-          <Route
-            path="/properties/:id"
-            element={<PropertyDetails />}
-          />
-
-
-          {/* ==========================
-              PROTECTED ROUTES
-          ========================== */}
-
-          <Route element={<ProtectedRoute />}>
+            {/* =========================
+                PUBLIC ROUTES
+            ========================= */}
 
             <Route
-              path="/owner/add-property"
-              element={<AddProperty />}
+              path="/"
+              element={<HomePage />}
             />
 
             <Route
-              path="/owner/my-properties"
-              element={<MyProperties />}
+              path="/login"
+              element={<Login />}
             />
 
-          </Route>
+            <Route
+              path="/register"
+              element={<Register />}
+            />
 
-        </Routes>
+            <Route
+              path="/properties"
+              element={<Properties />}
+            />
+
+            <Route
+              path="/properties/:id"
+              element={<PropertyDetails />}
+            />
+
+
+            {/* =========================
+                PROTECTED ROUTES
+            ========================= */}
+
+            <Route element={<ProtectedRoute />}>
+
+              {/* OWNER */}
+
+              <Route
+                path="/owner/add-property"
+                element={<AddProperty />}
+              />
+
+              <Route
+                path="/owner/my-properties"
+                element={<MyProperties />}
+              />
+
+              <Route
+                path="/owner/inquiries"
+                element={<OwnerInquiries />}
+              />
+
+
+              {/* SEEKER */}
+
+              <Route
+                path="/favorites"
+                element={<Favorites />}
+              />
+
+              <Route
+                path="/my-inquiries"
+                element={<MyInquiries />}
+              />
+
+
+              {/* =========================
+                  MESSAGING
+              ========================= */}
+
+              <Route
+                path="/messages"
+                element={<Messages />}
+              />
+
+            </Route>
+
+          </Routes>
+
+        </main>
 
         <Footer />
 
       </AuthProvider>
 
     </BrowserRouter>
+
   );
+
 }
+
 
 export default App;

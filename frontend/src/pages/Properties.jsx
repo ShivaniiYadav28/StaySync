@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
 import api from "../services/api";
+
 import "./Properties.css";
 
 function Properties() {
@@ -24,7 +26,8 @@ function Properties() {
     availableOnly: false,
   });
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] =
+    useState(1);
 
   const [pagination, setPagination] =
     useState({
@@ -34,6 +37,16 @@ function Properties() {
       hasNextPage: false,
       hasPreviousPage: false,
     });
+
+  // =====================================
+  // FAVORITES
+  // =====================================
+
+  const [favoriteIds, setFavoriteIds] =
+    useState(new Set());
+
+  const [favoriteLoading, setFavoriteLoading] =
+    useState({});
 
   // =====================================
   // FETCH PROPERTIES
@@ -90,12 +103,13 @@ function Properties() {
         params.availableOnly = "true";
       }
 
-      const response = await api.get(
-        "/properties",
-        {
-          params,
-        }
-      );
+      const response =
+        await api.get(
+          "/properties",
+          {
+            params,
+          }
+        );
 
       setProperties(
         response.data.properties || []
@@ -128,25 +142,160 @@ function Properties() {
   };
 
   // =====================================
+  // FETCH FAVORITES
+  // =====================================
+
+  const fetchFavorites = async () => {
+    try {
+      const response =
+        await api.get(
+          "/favorites"
+        );
+
+      const favoritePropertyIds =
+        new Set(
+          (response.data.favorites || [])
+            .map(
+              (favorite) =>
+                favorite.property?._id
+            )
+            .filter(Boolean)
+        );
+
+      setFavoriteIds(
+        favoritePropertyIds
+      );
+    } catch (error) {
+      // A visitor who is not logged in
+      // should still be able to browse properties.
+      // Therefore, favorite loading errors
+      // are intentionally ignored here.
+      console.log(
+        "Favorites not loaded:",
+        error.response?.data?.message ||
+          error.message
+      );
+    }
+  };
+
+  // =====================================
+  // TOGGLE FAVORITE
+  // =====================================
+
+  const handleFavoriteToggle = async (
+    propertyId
+  ) => {
+    if (
+      favoriteLoading[propertyId]
+    ) {
+      return;
+    }
+
+    setFavoriteLoading(
+      (previous) => ({
+        ...previous,
+        [propertyId]: true,
+      })
+    );
+
+    try {
+      const isFavorite =
+        favoriteIds.has(propertyId);
+
+      if (isFavorite) {
+        await api.delete(
+          `/favorites/${propertyId}`
+        );
+
+        setFavoriteIds(
+          (previous) => {
+            const updated =
+              new Set(previous);
+
+            updated.delete(propertyId);
+
+            return updated;
+          }
+        );
+      } else {
+        await api.post(
+          `/favorites/${propertyId}`
+        );
+
+        setFavoriteIds(
+          (previous) => {
+            const updated =
+              new Set(previous);
+
+            updated.add(propertyId);
+
+            return updated;
+          }
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Failed to update favorite:",
+        error
+      );
+
+      if (
+        error.response?.status === 401
+      ) {
+        alert(
+          "Please login as a seeker to save properties."
+        );
+      } else if (
+        error.response?.status === 403
+      ) {
+        alert(
+          "Only seekers can save properties."
+        );
+      } else {
+        alert(
+          error.response?.data?.message ||
+            "Unable to update favorite."
+        );
+      }
+    } finally {
+      setFavoriteLoading(
+        (previous) => ({
+          ...previous,
+          [propertyId]: false,
+        })
+      );
+    }
+  };
+
+  // =====================================
   // INITIAL LOAD
   // =====================================
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadProperties = async () => {
-      if (!isMounted) {
-        return;
-      }
+    const loadProperties =
+      async () => {
+        if (!isMounted) {
+          return;
+        }
 
-      await fetchProperties(1);
-    };
+        await fetchProperties(1);
+      };
 
     loadProperties();
 
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  // =====================================
+  // LOAD FAVORITES
+  // =====================================
+
+  useEffect(() => {
+    fetchFavorites();
   }, []);
 
   // =====================================
@@ -161,13 +310,15 @@ function Properties() {
       checked,
     } = e.target;
 
-    setFilters((previous) => ({
-      ...previous,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
-    }));
+    setFilters(
+      (previous) => ({
+        ...previous,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : value,
+      })
+    );
   };
 
   // =====================================
@@ -222,51 +373,69 @@ function Properties() {
           limit: 12,
         };
 
-        if (currentFilters.search.trim()) {
+        if (
+          currentFilters.search.trim()
+        ) {
           params.search =
             currentFilters.search.trim();
         }
 
-        if (currentFilters.city.trim()) {
+        if (
+          currentFilters.city.trim()
+        ) {
           params.city =
             currentFilters.city.trim();
         }
 
-        if (currentFilters.propertyType) {
+        if (
+          currentFilters.propertyType
+        ) {
           params.propertyType =
             currentFilters.propertyType;
         }
 
-        if (currentFilters.gender) {
+        if (
+          currentFilters.gender
+        ) {
           params.gender =
             currentFilters.gender;
         }
 
-        if (currentFilters.roomType) {
+        if (
+          currentFilters.roomType
+        ) {
           params.roomType =
             currentFilters.roomType;
         }
 
-        if (currentFilters.minRent !== "") {
+        if (
+          currentFilters.minRent !== ""
+        ) {
           params.minRent =
             currentFilters.minRent;
         }
 
-        if (currentFilters.maxRent !== "") {
+        if (
+          currentFilters.maxRent !== ""
+        ) {
           params.maxRent =
             currentFilters.maxRent;
         }
 
-        if (currentFilters.availableOnly) {
-          params.availableOnly = "true";
+        if (
+          currentFilters.availableOnly
+        ) {
+          params.availableOnly =
+            "true";
         }
 
-        const response = await api.get(
-          "/properties",
-          {
-            params,
-          }
-        );
+        const response =
+          await api.get(
+            "/properties",
+            {
+              params,
+            }
+          );
 
         setProperties(
           response.data.properties || []
@@ -315,7 +484,9 @@ function Properties() {
   // =====================================
 
   const handleNext = () => {
-    if (pagination.hasNextPage) {
+    if (
+      pagination.hasNextPage
+    ) {
       fetchProperties(page + 1);
     }
   };
@@ -552,7 +723,6 @@ function Properties() {
               Clear
             </button>
           </div>
-
         </form>
 
         {/* =================================
@@ -626,6 +796,16 @@ function Properties() {
                       ? property.images[0].url
                       : null;
 
+                  const isFavorite =
+                    favoriteIds.has(
+                      property._id
+                    );
+
+                  const isFavoriteLoading =
+                    favoriteLoading[
+                      property._id
+                    ];
+
                   return (
                     <div
                       className="property-card"
@@ -661,6 +841,38 @@ function Properties() {
                           }
                         </span>
 
+                        {/* FAVORITE BUTTON */}
+
+                        <button
+                          type="button"
+                          className={`favorite-button ${
+                            isFavorite
+                              ? "favorite-active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            handleFavoriteToggle(
+                              property._id
+                            )
+                          }
+                          disabled={
+                            isFavoriteLoading
+                          }
+                          aria-label={
+                            isFavorite
+                              ? "Remove from favorites"
+                              : "Add to favorites"
+                          }
+                          title={
+                            isFavorite
+                              ? "Remove from favorites"
+                              : "Save property"
+                          }
+                        >
+                          {isFavorite
+                            ? "♥"
+                            : "♡"}
+                        </button>
                       </div>
 
                       {/* PROPERTY CONTENT */}
@@ -680,7 +892,6 @@ function Properties() {
                               property.gender
                             }
                           </span>
-
                         </div>
 
                         <h3>
@@ -725,7 +936,6 @@ function Properties() {
                         </Link>
 
                       </div>
-
                     </div>
                   );
                 }

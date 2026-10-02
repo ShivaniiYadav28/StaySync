@@ -1,0 +1,480 @@
+/* =========================================
+   OWNER INQUIRIES
+========================================= */
+
+.owner-inquiries-page {
+  min-height: 75vh;
+  padding: 50px 20px;
+  background: #f8fafb;
+}
+
+.owner-inquiries-container {
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.owner-inquiries-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.owner-inquiries-header h1 {
+  margin: 0 0 8px;
+  color: #101828;
+  font-size: 32px;
+}
+
+.owner-inquiries-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 15px;
+}
+
+.owner-inquiries-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  border-radius: 8px;
+  background: #147d76;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.owner-inquiries-back-button:hover {
+  background: #0f6963;
+}
+
+
+/* =========================================
+   LIST
+========================================= */
+
+.owner-inquiries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.owner-inquiry-card {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================================
+   IMAGE
+========================================= */
+
+.owner-inquiry-image {
+  min-height: 420px;
+  background: #f2f4f7;
+}
+
+.owner-inquiry-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+}
+
+.owner-inquiry-no-image {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.owner-inquiry-content {
+  padding: 28px;
+}
+
+
+/* =========================================
+   TOP
+========================================= */
+
+.owner-inquiry-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.owner-inquiry-top h2 {
+  margin: 0 0 7px;
+  color: #101828;
+  font-size: 23px;
+}
+
+.owner-inquiry-location {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.owner-inquiry-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.owner-inquiry-status-pending {
+  background: #fff4cc;
+  color: #8a5a00;
+}
+
+.owner-inquiry-status-accepted {
+  background: #e8f6f4;
+  color: #0f6963;
+}
+
+.owner-inquiry-status-rejected {
+  background: #fff1f1;
+  color: #b42318;
+}
+
+.owner-inquiry-status-withdrawn {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+
+/* =========================================
+   SEEKER INFORMATION
+========================================= */
+
+.seeker-information {
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: 10px;
+  background: #f8fafb;
+}
+
+.seeker-information h3,
+.seeker-message h3,
+.existing-owner-response h3 {
+  margin: 0 0 13px;
+  color: #344054;
+  font-size: 15px;
+}
+
+.seeker-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.seeker-details-grid div,
+.owner-property-information div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.seeker-details-grid span,
+.owner-property-information span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.seeker-details-grid strong,
+.owner-property-information strong {
+  color: #101828;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+
+/* =========================================
+   PROPERTY INFORMATION
+========================================= */
+
+.owner-property-information {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 15px;
+  padding: 17px;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+}
+
+
+/* =========================================
+   SEEKER MESSAGE
+========================================= */
+
+.seeker-message {
+  margin-top: 15px;
+  padding: 17px;
+  border-radius: 10px;
+  background: #f8fafb;
+}
+
+.seeker-message p,
+.existing-owner-response p {
+  margin: 0;
+  color: #475467;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   EXISTING OWNER RESPONSE
+========================================= */
+
+.existing-owner-response {
+  margin-top: 15px;
+  padding: 17px;
+  border-radius: 10px;
+  background: #e8f6f4;
+}
+
+
+/* =========================================
+   OWNER ACTION
+========================================= */
+
+.owner-action-section {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #dfe5e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.owner-response-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.owner-response-field label {
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.owner-response-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  color: #101828;
+  outline: none;
+}
+
+.owner-response-field textarea:focus {
+  border-color: #147d76;
+  box-shadow:
+    0 0 0 3px rgba(20, 125, 118, 0.12);
+}
+
+.owner-response-field small {
+  align-self: flex-end;
+  color: #667085;
+  font-size: 12px;
+}
+
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.owner-action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.accept-inquiry-button,
+.reject-inquiry-button {
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accept-inquiry-button {
+  border: 1px solid #147d76;
+  background: #147d76;
+  color: #ffffff;
+}
+
+.accept-inquiry-button:hover {
+  background: #0f6963;
+}
+
+.reject-inquiry-button {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #b42318;
+}
+
+.reject-inquiry-button:hover {
+  background: #fff1f1;
+}
+
+.accept-inquiry-button:disabled,
+.reject-inquiry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.owner-inquiry-footer {
+  margin-top: 20px;
+}
+
+.owner-view-property-button {
+  display: inline-flex;
+  padding: 10px 17px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344054;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.owner-view-property-button:hover {
+  background: #f9fafb;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.owner-inquiries-empty {
+  padding: 70px 25px;
+  text-align: center;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.owner-inquiries-empty-icon {
+  margin-bottom: 15px;
+  font-size: 45px;
+}
+
+.owner-inquiries-empty h2 {
+  margin: 0 0 8px;
+  color: #101828;
+}
+
+.owner-inquiries-empty p {
+  max-width: 500px;
+  margin: 0 auto 25px;
+  color: #667085;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   STATES
+========================================= */
+
+.owner-inquiries-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: #667085;
+}
+
+.owner-inquiries-error {
+  color: #b42318;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
+  .owner-inquiries-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .owner-inquiry-card {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-inquiry-image,
+  .owner-inquiry-image img,
+  .owner-inquiry-no-image {
+    min-height: 240px;
+    height: 240px;
+  }
+
+  .seeker-details-grid,
+  .owner-property-information {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-inquiry-top {
+    flex-direction: column;
+  }
+
+  .owner-action-buttons {
+    flex-direction: column;
+  }
+
+  .accept-inquiry-button,
+  .reject-inquiry-button {
+    width: 100%;
+  }
+}

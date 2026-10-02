@@ -1,0 +1,308 @@
+/* =========================================
+   MY INQUIRIES
+========================================= */
+
+.inquiries-page {
+  min-height: 75vh;
+  padding: 50px 20px;
+  background: #f8fafb;
+}
+
+.inquiries-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.inquiries-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.inquiries-header h1 {
+  margin: 0 0 8px;
+  color: #101828;
+  font-size: 32px;
+}
+
+.inquiries-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 15px;
+}
+
+.browse-properties-button,
+.view-property-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.browse-properties-button {
+  background: #147d76;
+  color: #ffffff;
+}
+
+.browse-properties-button:hover {
+  background: #0f6963;
+}
+
+.inquiries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.inquiry-card {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.inquiry-card-image {
+  min-height: 300px;
+  background: #f2f4f7;
+}
+
+.inquiry-card-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  object-fit: cover;
+}
+
+.inquiry-no-image {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.inquiry-card-content {
+  padding: 25px;
+}
+
+.inquiry-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.inquiry-card-top h2 {
+  margin: 0 0 7px;
+  color: #101828;
+  font-size: 22px;
+}
+
+.inquiry-location {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.inquiry-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.inquiry-status-pending {
+  background: #fff4cc;
+  color: #8a5a00;
+}
+
+.inquiry-status-accepted {
+  background: #e8f6f4;
+  color: #0f6963;
+}
+
+.inquiry-status-rejected {
+  background: #fff1f1;
+  color: #b42318;
+}
+
+.inquiry-status-withdrawn {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+.inquiry-property-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 22px 0;
+  padding: 17px;
+  border-radius: 10px;
+  background: #f8fafb;
+}
+
+.inquiry-property-details div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inquiry-property-details span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.inquiry-property-details strong {
+  color: #101828;
+  font-size: 14px;
+}
+
+.inquiry-message,
+.owner-response {
+  padding: 16px;
+  margin-top: 15px;
+  border-radius: 9px;
+}
+
+.inquiry-message {
+  background: #f8fafb;
+}
+
+.owner-response {
+  background: #e8f6f4;
+}
+
+.inquiry-message h3,
+.owner-response h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #344054;
+}
+
+.inquiry-message p,
+.owner-response p {
+  margin: 0;
+  color: #475467;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.inquiry-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.view-property-button {
+  background: #147d76;
+  color: #ffffff;
+}
+
+.view-property-button:hover {
+  background: #0f6963;
+}
+
+.withdraw-button {
+  padding: 10px 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.withdraw-button:hover {
+  background: #f9fafb;
+}
+
+.withdraw-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inquiries-empty {
+  padding: 70px 25px;
+  text-align: center;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.inquiries-empty-icon {
+  margin-bottom: 15px;
+  font-size: 45px;
+}
+
+.inquiries-empty h2 {
+  margin: 0 0 8px;
+  color: #101828;
+}
+
+.inquiries-empty p {
+  margin: 0 0 25px;
+  color: #667085;
+}
+
+.inquiries-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: #667085;
+}
+
+.inquiries-error {
+  color: #b42318;
+}
+
+@media (max-width: 750px) {
+  .inquiries-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inquiry-card {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-card-image,
+  .inquiry-card-image img,
+  .inquiry-no-image {
+    min-height: 220px;
+    height: 220px;
+  }
+
+  .inquiry-property-details {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-card-top {
+    flex-direction: column;
+  }
+
+  .inquiry-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .view-property-button,
+  .withdraw-button {
+    width: 100%;
+  }
+}
