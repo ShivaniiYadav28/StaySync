@@ -1,10 +1,10 @@
 /* =====================================
-   HOME PAGE
+   HOME PAGE — DARK THEME
 ===================================== */
 
 .home-page {
-  background: #f8fafc;
-  color: #172033;
+  background: #0b1120;
+  color: #f8fafc;
 }
 
 
@@ -13,11 +13,24 @@
 ===================================== */
 
 .hero-section {
-  background: #0f766e;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(20, 184, 166, 0.16),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #0b2530 55%,
+      #0f766e 100%
+    );
+
   min-height: 570px;
-  display: flex;
-  align-items: center;
-  padding: 70px 7%;
+
+  display: block;
+
+  padding: 80px 7%;
   box-sizing: border-box;
 }
 
@@ -33,66 +46,109 @@
   align-items: center;
 }
 
+
+/* =====================================
+   HERO TEXT
+===================================== */
+
 .hero-label {
-  color: #99f6e4;
+  color: #5eead4;
+
   font-size: 13px;
   font-weight: 800;
+
   letter-spacing: 3px;
+
   margin-bottom: 18px;
 }
 
 .hero-text h1 {
-  color: white;
+  color: #f8fafc;
+
   font-size: 60px;
   line-height: 1.05;
+
   margin: 0;
+
   letter-spacing: -2px;
 }
 
 .hero-text h1 span {
-  color: #99f6e4;
+  color: #5eead4;
 }
 
 .hero-description {
   max-width: 600px;
-  color: #ccfbf1;
+
+  color: #cbd5e1;
+
   font-size: 18px;
   line-height: 1.7;
+
   margin: 25px 0 30px;
 }
 
+
+/* =====================================
+   HERO BUTTONS
+===================================== */
+
 .hero-buttons {
   display: flex;
+
   gap: 14px;
+
   flex-wrap: wrap;
 }
 
 .primary-btn,
 .secondary-btn {
   display: inline-block;
+
   text-decoration: none;
+
   padding: 13px 22px;
-  border-radius: 8px;
+
+  border-radius: 9px;
+
   font-weight: 700;
-  transition: 0.2s;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .primary-btn {
-  background: white;
-  color: #0f766e;
+  background: #14b8a6;
+  color: #042f2e;
+
+  box-shadow:
+    0 8px 25px rgba(20, 184, 166, 0.2);
 }
 
 .primary-btn:hover {
   transform: translateY(-2px);
+
+  background: #2dd4bf;
+
+  box-shadow:
+    0 12px 30px rgba(20, 184, 166, 0.3);
 }
 
 .secondary-btn {
-  border: 1px solid #99f6e4;
-  color: white;
+  border: 1px solid #5eead4;
+
+  color: #f0fdfa;
+
+  background: rgba(15, 23, 42, 0.2);
 }
 
 .secondary-btn:hover {
-  background: #115e59;
+  background: rgba(20, 184, 166, 0.15);
+
+  border-color: #2dd4bf;
 }
 
 
@@ -101,65 +157,194 @@
 ===================================== */
 
 .hero-card {
-  background: white;
-  border-radius: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      #172033,
+      #111827
+    );
+
+  border: 1px solid #334155;
+
+  border-radius: 20px;
+
   padding: 30px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.35);
 }
 
 .hero-card-top {
   display: flex;
+
   justify-content: space-between;
-  color: #64748b;
+
+  color: #94a3b8;
+
   font-size: 13px;
 }
 
 .online-dot {
-  color: #14b8a6;
+  color: #2dd4bf;
+
+  text-shadow:
+    0 0 10px rgba(45, 212, 191, 0.7);
 }
 
 .hero-card h3 {
-  color: #172033;
+  color: #f8fafc;
+
   font-size: 30px;
+
   margin: 18px 0 8px;
 }
 
 .hero-card > p {
-  color: #64748b;
+  color: #94a3b8;
+
   line-height: 1.6;
 }
 
 .hero-stats {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 10px;
 
   margin: 25px 0;
+
   padding: 18px 0;
 
-  border-top: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
+  border-top: 1px solid #334155;
+
+  border-bottom: 1px solid #334155;
 }
 
 .hero-stats div {
   display: flex;
+
   flex-direction: column;
+
   gap: 5px;
 }
 
 .hero-stats strong {
-  color: #0f766e;
+  color: #2dd4bf;
 }
 
 .hero-stats span {
-  color: #64748b;
+  color: #94a3b8;
+
   font-size: 11px;
 }
 
 .hero-card-link {
-  color: #0f766e;
+  color: #5eead4;
+
   text-decoration: none;
+
   font-weight: 700;
+
+  transition: color 0.2s ease;
+}
+
+.hero-card-link:hover {
+  color: #99f6e4;
+}
+
+
+/* =====================================
+   PROPERTY SEARCH
+===================================== */
+
+/*
+   PropertySearch.jsx uses Tailwind classes.
+   These overrides make the search bar match
+   the dark StaySync theme.
+*/
+
+.hero-section > .mt-10 {
+  width: 100%;
+
+  max-width: 1200px;
+
+  margin: 35px auto 0 !important;
+
+  padding: 0 20px;
+
+  position: relative;
+
+  z-index: 5;
+}
+
+.hero-section > .mt-10 > div {
+  width: 100%;
+}
+
+
+/* Search outer card */
+
+.hero-section > .mt-10 .bg-white {
+  background: #111827 !important;
+
+  border-color: #334155 !important;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35) !important;
+}
+
+
+/* Search labels */
+
+.hero-section > .mt-10 label {
+  color: #e2e8f0 !important;
+}
+
+
+/* Search inputs */
+
+.hero-section > .mt-10 input,
+.hero-section > .mt-10 select {
+  background: #0f172a !important;
+
+  color: #f8fafc !important;
+
+  border-color: #475569 !important;
+}
+
+.hero-section > .mt-10 input::placeholder {
+  color: #64748b !important;
+}
+
+.hero-section > .mt-10 input:focus,
+.hero-section > .mt-10 select:focus {
+  border-color: #14b8a6 !important;
+
+  box-shadow:
+    0 0 0 4px rgba(20, 184, 166, 0.12) !important;
+}
+
+
+/* Select dropdown options */
+
+.hero-section > .mt-10 select option {
+  background: #111827;
+
+  color: #f8fafc;
+}
+
+
+/* Search button */
+
+.hero-section > .mt-10 button {
+  background: #0d9488 !important;
+
+  color: white !important;
+}
+
+.hero-section > .mt-10 button:hover {
+  background: #14b8a6 !important;
 }
 
 
@@ -169,7 +354,9 @@
 
 .features-section {
   max-width: 1200px;
+
   margin: auto;
+
   padding: 90px 7%;
 }
 
@@ -178,66 +365,108 @@
 }
 
 .section-heading p {
-  color: #0f766e;
+  color: #2dd4bf;
+
   font-size: 12px;
+
   font-weight: 800;
+
   letter-spacing: 2px;
 }
 
 .section-heading h2 {
-  color: #172033;
+  color: #f8fafc;
+
   font-size: 38px;
+
   line-height: 1.15;
+
   margin: 10px 0 15px;
 }
 
 .section-heading span {
-  color: #64748b;
+  color: #94a3b8;
+
   line-height: 1.6;
 }
 
+
+/* =====================================
+   FEATURE CARDS
+===================================== */
+
 .features-grid {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   gap: 20px;
 }
 
 .feature-card {
-  background: white;
+  background:
+    linear-gradient(
+      145deg,
+      #111827,
+      #0f172a
+    );
+
   padding: 25px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  transition: 0.2s;
+
+  border: 1px solid #273449;
+
+  border-radius: 14px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(15, 118, 110, 0.08);
+  transform: translateY(-5px);
+
+  border-color: #0d9488;
+
+  box-shadow:
+    0 15px 35px rgba(20, 184, 166, 0.08);
 }
 
 .feature-icon {
   width: 45px;
+
   height: 45px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  background: #ccfbf1;
+  background:
+    rgba(20, 184, 166, 0.12);
+
+  border: 1px solid
+    rgba(45, 212, 191, 0.15);
+
   border-radius: 10px;
 
   font-size: 20px;
+
   margin-bottom: 20px;
 }
 
 .feature-card h3 {
-  color: #172033;
+  color: #f8fafc;
+
   margin-bottom: 10px;
 }
 
 .feature-card p {
-  color: #64748b;
+  color: #94a3b8;
+
   line-height: 1.6;
+
   font-size: 14px;
 }
 
@@ -247,8 +476,14 @@
 ===================================== */
 
 .how-section {
-  background: white;
+  background:
+    #111827;
+
   padding: 90px 7%;
+
+  border-top: 1px solid #1e293b;
+
+  border-bottom: 1px solid #1e293b;
 }
 
 .center {
@@ -257,50 +492,68 @@
 
 .steps {
   max-width: 1000px;
+
   margin: 50px auto 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 }
 
 .step {
   text-align: center;
+
   max-width: 230px;
 }
 
 .step-number {
   width: 55px;
+
   height: 55px;
 
   margin: auto;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   border-radius: 50%;
 
-  background: #ccfbf1;
-  color: #0f766e;
+  background:
+    rgba(20, 184, 166, 0.12);
+
+  border: 1px solid
+    rgba(45, 212, 191, 0.25);
+
+  color: #2dd4bf;
 
   font-weight: 800;
 }
 
 .step h3 {
+  color: #f8fafc;
+
   margin: 18px 0 8px;
 }
 
 .step p {
-  color: #64748b;
+  color: #94a3b8;
+
   line-height: 1.5;
+
   font-size: 14px;
 }
 
 .step-line {
   height: 1px;
+
   width: 100px;
-  background: #cbd5e1;
+
+  background: #334155;
 }
 
 
@@ -310,49 +563,83 @@
 
 .owner-section {
   padding: 80px 7%;
-  background: #f0fdfa;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f292b,
+      #102a35
+    );
+
+  border-bottom: 1px solid #1e293b;
 }
 
 .owner-content {
   max-width: 1100px;
+
   margin: auto;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 40px;
 }
 
 .owner-label {
-  color: #0f766e;
+  color: #2dd4bf;
+
   font-size: 12px;
+
   font-weight: 800;
+
   letter-spacing: 2px;
 }
 
 .owner-content h2 {
+  color: #f8fafc;
+
   font-size: 38px;
+
   line-height: 1.15;
+
   margin: 10px 0 15px;
 }
 
 .owner-content p {
-  color: #64748b;
+  color: #94a3b8;
+
   line-height: 1.6;
+
   max-width: 600px;
 }
 
 .owner-btn {
-  background: #0f766e;
-  color: white;
+  background: #14b8a6;
+
+  color: #042f2e;
+
   text-decoration: none;
 
   padding: 14px 22px;
-  border-radius: 8px;
+
+  border-radius: 9px;
 
   font-weight: 700;
+
   white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.owner-btn:hover {
+  background: #2dd4bf;
+
+  transform: translateY(-2px);
 }
 
 
@@ -362,21 +649,35 @@
 
 .final-cta {
   text-align: center;
+
   padding: 100px 20px;
-  background: #115e59;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(20, 184, 166, 0.2),
+      transparent 45%
+    ),
+    #0b1120;
 }
 
 .final-cta p {
-  color: #99f6e4;
+  color: #5eead4;
+
   font-size: 12px;
+
   font-weight: 800;
+
   letter-spacing: 2px;
 }
 
 .final-cta h2 {
-  color: white;
+  color: #f8fafc;
+
   font-size: 44px;
+
   line-height: 1.15;
+
   margin: 15px 0 30px;
 }
 
@@ -386,8 +687,10 @@
 ===================================== */
 
 @media (max-width: 950px) {
+
   .hero-content {
     grid-template-columns: 1fr;
+
     gap: 45px;
   }
 
@@ -414,6 +717,7 @@
 
 
 @media (max-width: 650px) {
+
   .hero-text h1 {
     font-size: 40px;
   }
@@ -432,11 +736,13 @@
 
   .step-line {
     width: 1px;
+
     height: 40px;
   }
 
   .owner-content {
     flex-direction: column;
+
     align-items: flex-start;
   }
 
@@ -447,4 +753,63 @@
   .final-cta h2 {
     font-size: 34px;
   }
+
+
+  /* Mobile search */
+
+  .hero-section > .mt-10 {
+    margin-top: 30px !important;
+
+    padding: 0 16px;
+  }
+}
+/* ==================================================
+   PROPERTY OWNER CTA - DARK THEME FIX
+================================================== */
+
+.owner-section {
+  background:
+    linear-gradient(
+      135deg,
+      #111827 0%,
+      #0f292b 50%,
+      #0f766e 100%
+    ) !important;
+
+  color: #f8fafc !important;
+
+  border: 1px solid #273449;
+
+  border-radius: 0 0 18px 18px;
+}
+
+.owner-section h2,
+.owner-section h3,
+.owner-section h4 {
+  color: #f8fafc !important;
+}
+
+.owner-section p {
+  color: #cbd5e1 !important;
+}
+
+.owner-section .section-label,
+.owner-section .eyebrow {
+  color: #5eead4 !important;
+}
+
+.owner-section a,
+.owner-section button {
+  background: #14b8a6 !important;
+
+  color: #062a27 !important;
+
+  border-color: #14b8a6 !important;
+}
+
+.owner-section a:hover,
+.owner-section button:hover {
+  background: #2dd4bf !important;
+
+  color: #042f2e !important;
 }

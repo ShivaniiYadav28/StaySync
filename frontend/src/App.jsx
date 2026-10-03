@@ -8,8 +8,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import AuthProvider from "./context/AuthContext.jsx";
-
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -26,114 +24,125 @@ import MyInquiries from "./pages/MyInquiries";
 
 import Messages from "./pages/Messages";
 
+import Roommates from "./pages/Roommates";
+
 import "./App.css";
 
 
 function App() {
-
   return (
-
     <BrowserRouter>
 
-      <AuthProvider>
+      <Navbar />
 
-        <Navbar />
+      <Routes>
 
-        <main>
+        {/* ==========================================
+            PUBLIC ROUTES
+            ========================================== */}
 
-          <Routes>
+        <Route
+          path="/"
+          element={<HomePage />}
+        />
 
-            {/* =========================
-                PUBLIC ROUTES
-            ========================= */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-            <Route
-              path="/"
-              element={<HomePage />}
-            />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-            <Route
-              path="/login"
-              element={<Login />}
-            />
+        <Route
+          path="/properties"
+          element={<Properties />}
+        />
 
-            <Route
-              path="/register"
-              element={<Register />}
-            />
-
-            <Route
-              path="/properties"
-              element={<Properties />}
-            />
-
-            <Route
-              path="/properties/:id"
-              element={<PropertyDetails />}
-            />
+        <Route
+          path="/properties/:id"
+          element={<PropertyDetails />}
+        />
 
 
-            {/* =========================
-                PROTECTED ROUTES
-            ========================= */}
+        {/* ==========================================
+            PROTECTED ROUTES
+            ========================================== */}
 
-            <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute />}>
 
-              {/* OWNER */}
+          {/* ----------------------------------------
+              OWNER ROUTES
+              ---------------------------------------- */}
 
-              <Route
-                path="/owner/add-property"
-                element={<AddProperty />}
-              />
+          <Route
+            path="/owner/add-property"
+            element={<AddProperty />}
+          />
 
-              <Route
-                path="/owner/my-properties"
-                element={<MyProperties />}
-              />
+          <Route
+            path="/owner/my-properties"
+            element={<MyProperties />}
+          />
 
-              <Route
-                path="/owner/inquiries"
-                element={<OwnerInquiries />}
-              />
-
-
-              {/* SEEKER */}
-
-              <Route
-                path="/favorites"
-                element={<Favorites />}
-              />
-
-              <Route
-                path="/my-inquiries"
-                element={<MyInquiries />}
-              />
+          <Route
+            path="/owner/inquiries"
+            element={<OwnerInquiries />}
+          />
 
 
-              {/* =========================
-                  MESSAGING
-              ========================= */}
+          {/* ----------------------------------------
+              SEEKER ROUTES
+              ---------------------------------------- */}
 
-              <Route
-                path="/messages"
-                element={<Messages />}
-              />
+          <Route
+            path="/favorites"
+            element={<Favorites />}
+          />
 
-            </Route>
+          <Route
+            path="/my-inquiries"
+            element={<MyInquiries />}
+          />
 
-          </Routes>
 
-        </main>
+          {/* ----------------------------------------
+              MESSAGING
+              ---------------------------------------- */}
 
-        <Footer />
+          <Route
+            path="/messages"
+            element={<Messages />}
+          />
 
-      </AuthProvider>
+
+          {/* ----------------------------------------
+              ROOMMATE MATCHING
+              ---------------------------------------- */}
+
+          <Route
+            path="/roommates"
+            element={<Roommates />}
+          />
+
+          {/* 
+            The individual roommate profile page
+            will be added later.
+
+            Example future route:
+            /roommates/:id
+          */}
+
+        </Route>
+
+      </Routes>
+
+      <Footer />
 
     </BrowserRouter>
-
   );
-
 }
-
 
 export default App;

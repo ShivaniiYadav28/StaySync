@@ -1,152 +1,416 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import { useAuth } from "../context/useAuth";
+
 import "./Login.css";
+
 
 function Login() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const { login } = useAuth();
+  const {
+    login,
+    isAuthenticated,
+    loading: authLoading,
+  } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  // =========================================
+  // FORM STATE
+  // =========================================
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const [
+    email,
+    setEmail,
+  ] = useState("");
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+  const [
+    password,
+    setPassword,
+  ] = useState("");
+
+
+  // =========================================
+  // PAGE STATE
+  // =========================================
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+
+  // =========================================
+  // REDIRECT IF ALREADY LOGGED IN
+  // =========================================
+
+  useEffect(() => {
+    if (
+      !authLoading &&
+      isAuthenticated
+    ) {
+      navigate(
+        "/properties",
+        {
+          replace: true,
+        }
+      );
+    }
+  }, [
+    isAuthenticated,
+    authLoading,
+    navigate,
+  ]);
+
+
+  // =========================================
+  // INPUT HANDLERS
+  // =========================================
+
+  const handleEmailChange = (
+    event
+  ) => {
+    setEmail(
+      event.target.value
+    );
+
+    if (error) {
+      setError("");
+    }
   };
 
-  const handleSubmit = async (event) => {
+
+  const handlePasswordChange = (
+    event
+  ) => {
+    setPassword(
+      event.target.value
+    );
+
+    if (error) {
+      setError("");
+    }
+  };
+
+
+  // =========================================
+  // FORM SUBMIT
+  // =========================================
+
+  const handleSubmit = async (
+    event
+  ) => {
     event.preventDefault();
 
     setError("");
 
-    if (!formData.email || !formData.password) {
-      setError("Email and password are required.");
+
+    // =======================================
+    // BASIC VALIDATION
+    // =======================================
+
+    const cleanEmail =
+      email.trim();
+
+    if (!cleanEmail) {
+      setError(
+        "Please enter your email address."
+      );
       return;
     }
+
+
+    if (!password) {
+      setError(
+        "Please enter your password."
+      );
+      return;
+    }
+
+
+    // =======================================
+    // LOGIN
+    // =======================================
 
     try {
       setLoading(true);
 
-      const response = await login(
-        formData.email,
-        formData.password
+
+      const response =
+        await login(
+          cleanEmail,
+          password
+        );
+
+
+      console.log(
+        "Login response:",
+        response
       );
 
-      const user = response.user;
 
-      const from = location.state?.from?.pathname;
+      // =====================================
+      // GET LOGGED-IN USER SAFELY
+      // =====================================
 
-      if (from) {
-        navigate(from, {
-          replace: true,
-        });
+      const loggedInUser =
+        response?.data?.user ||
+        response?.data?.data?.user ||
+        null;
+
+
+      // =====================================
+      // PROTECT AGAINST MISSING USER
+      // =====================================
+
+      if (!loggedInUser) {
+        throw new Error(
+          "Login succeeded, but user information was not returned."
+        );
+      }
+
+
+      console.log(
+        "Logged-in user:",
+        loggedInUser
+      );
+
+
+      // =====================================
+      // ROLE-BASED NAVIGATION
+      // =====================================
+
+      if (
+        loggedInUser.role ===
+        "owner"
+      ) {
+        navigate(
+          "/owner/my-properties",
+          {
+            replace: true,
+          }
+        );
 
         return;
       }
 
-      if (user.role === "owner") {
-        navigate("/owner/my-properties", {
-          replace: true,
-        });
+
+      if (
+        loggedInUser.role ===
+        "admin"
+      ) {
+        navigate(
+          "/",
+          {
+            replace: true,
+          }
+        );
 
         return;
       }
 
-      navigate("/properties", {
-        replace: true,
-      });
-    } catch (error) {
-      console.error(error);
 
-      setError(
-        error.response?.data?.message ||
+      // Default: seeker
+      navigate(
+        "/properties",
+        {
+          replace: true,
+        }
+      );
+
+    } catch (loginError) {
+
+      console.error(
+        "Login error:",
+        loginError
+      );
+
+
+      // =====================================
+      // ERROR MESSAGE
+      // =====================================
+
+      const serverMessage =
+        loginError
+          ?.response
+          ?.data
+          ?.message;
+
+
+      if (serverMessage) {
+        setError(
+          serverMessage
+        );
+
+      } else if (
+        loginError?.message
+      ) {
+        setError(
+          loginError.message
+        );
+
+      } else {
+        setError(
           "Login failed. Please try again."
-      );
+        );
+      }
+
     } finally {
       setLoading(false);
     }
   };
 
+
+  // =========================================
+  // LOADING SCREEN
+  // =========================================
+
+  if (authLoading) {
+    return (
+      <div className="login-page">
+        <div className="login-loading">
+          Checking authentication...
+        </div>
+      </div>
+    );
+  }
+
+
+  // =========================================
+  // UI
+  // =========================================
+
   return (
-    <div className="auth-page">
-      <div className="auth-card">
+    <div className="login-page">
 
-        {/* LEFT INFORMATION SECTION */}
-        <div className="auth-info">
+      <div className="login-container">
 
-          <div className="auth-logo">
-            <span>🏠</span>
-            <strong>StaySync</strong>
-          </div>
 
-          <h1>
-            Find your
-            <br />
-            perfect <span>place.</span>
-          </h1>
+        {/* ====================================
+            LEFT / BRAND SECTION
+        ==================================== */}
 
-          <p>
-            Find comfortable, affordable and suitable
-            PGs and rooms for your next stay.
-          </p>
+        <div className="login-brand-section">
 
-          <div className="auth-benefits">
+          <div className="login-brand-content">
 
-            <div className="auth-benefit">
-              <span>✓</span>
-              <p>Verified PGs and rooms</p>
+            <div className="login-brand-icon">
+              🏠
             </div>
 
-            <div className="auth-benefit">
-              <span>✓</span>
-              <p>Search by location and budget</p>
-            </div>
+            <h1>
+              Find your perfect stay.
+            </h1>
 
-            <div className="auth-benefit">
-              <span>✓</span>
-              <p>Find a stay that suits you</p>
+            <p>
+              Discover comfortable PGs,
+              rooms and compatible
+              roommates with StaySync.
+            </p>
+
+
+            <div className="login-brand-points">
+
+              <div className="login-brand-point">
+                <span>✓</span>
+                <p>
+                  Verified properties
+                </p>
+              </div>
+
+
+              <div className="login-brand-point">
+                <span>✓</span>
+                <p>
+                  Find compatible roommates
+                </p>
+              </div>
+
+
+              <div className="login-brand-point">
+                <span>✓</span>
+                <p>
+                  Connect directly with owners
+                </p>
+              </div>
+
+
+              <div className="login-brand-point">
+                <span>✓</span>
+                <p>
+                  Find a stay that suits you
+                </p>
+              </div>
+
             </div>
 
           </div>
 
         </div>
 
-        {/* RIGHT LOGIN SECTION */}
-        <div className="login-form-section">
 
-          <div className="login-heading">
-            <h2>Welcome back</h2>
+        {/* ====================================
+            LOGIN FORM
+        ==================================== */}
+
+        <div className="login-card">
+
+          <div className="login-header">
+
+            <h2>
+              Welcome back
+            </h2>
 
             <p>
               Sign in to continue to StaySync.
             </p>
+
           </div>
 
+
+          {/* ==================================
+              ERROR
+          ================================== */}
+
           {error && (
-            <div className="form-error">
+            <div
+              className="login-error"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
+
+          {/* ==================================
+              FORM
+          ================================== */}
+
           <form
             className="login-form"
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
           >
 
+
             {/* EMAIL */}
-            <div className="form-group">
+
+            <div className="login-form-group">
+
               <label htmlFor="email">
                 Email Address
               </label>
@@ -155,58 +419,84 @@ function Login() {
                 id="email"
                 type="email"
                 name="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={
+                  handleEmailChange
+                }
+                placeholder="Enter your email"
                 autoComplete="email"
+                disabled={loading}
+                required
               />
+
             </div>
 
+
             {/* PASSWORD */}
-            <div className="form-group">
+
+            <div className="login-form-group">
+
               <label htmlFor="password">
                 Password
               </label>
 
-              <div className="password-wrapper">
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  autoComplete="current-password"
-                />
-              </div>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={password}
+                onChange={
+                  handlePasswordChange
+                }
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                disabled={loading}
+                required
+              />
+
             </div>
 
-            {/* LOGIN BUTTON */}
+
+            {/* SUBMIT */}
+
             <button
               type="submit"
-              className="login-button"
+              className="login-submit-button"
               disabled={loading}
             >
+
               {loading
                 ? "Signing in..."
                 : "Sign In"}
+
             </button>
 
           </form>
 
-          <p className="register-prompt">
-            Don't have an account?
+
+          {/* ==================================
+              REGISTER
+          ================================== */}
+
+          <div className="login-register-link">
+
+            <span>
+              Don't have an account?
+            </span>
 
             <Link to="/register">
               Create one
             </Link>
-          </p>
+
+          </div>
 
         </div>
 
       </div>
+
     </div>
   );
 }
+
 
 export default Login;

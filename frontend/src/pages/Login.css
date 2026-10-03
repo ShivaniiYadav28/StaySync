@@ -1,5 +1,6 @@
 /* =====================================================
-   LOGIN PAGE
+   STAYSYNC LOGIN PAGE
+   DARK THEME
 ===================================================== */
 
 .auth-page {
@@ -14,14 +15,15 @@
   background:
     radial-gradient(
       circle at 10% 20%,
-      rgba(20, 184, 166, 0.12),
+      rgba(20, 184, 166, 0.10),
       transparent 30%
     ),
-    linear-gradient(
-      135deg,
-      #f8fafc,
-      #f0fdfa
-    );
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(15, 118, 110, 0.08),
+      transparent 30%
+    ),
+    #0b1120;
 }
 
 
@@ -39,14 +41,15 @@
 
   overflow: hidden;
 
-  background: #ffffff;
+  background: #111827;
 
-  border: 1px solid #e2e8f0;
+  border: 1px solid #273449;
 
   border-radius: 24px;
 
   box-shadow:
-    0 25px 60px rgba(15, 23, 42, 0.10);
+    0 25px 60px
+    rgba(0, 0, 0, 0.35);
 }
 
 
@@ -100,7 +103,11 @@
 
   border-radius: 10px;
 
-  background: rgba(255, 255, 255, 0.14);
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
 
   font-size: 21px;
 }
@@ -127,7 +134,8 @@
 
   margin: 0 0 35px;
 
-  color: rgba(255, 255, 255, 0.80);
+  color:
+    rgba(255, 255, 255, 0.80);
 
   font-size: 16px;
 
@@ -155,7 +163,8 @@
 
   gap: 12px;
 
-  color: rgba(255, 255, 255, 0.90);
+  color:
+    rgba(255, 255, 255, 0.90);
 
   font-size: 14px;
 }
@@ -179,7 +188,8 @@
 
   border-radius: 50%;
 
-  background: rgba(255, 255, 255, 0.14);
+  background:
+    rgba(255, 255, 255, 0.14);
 
   color: #ccfbf1;
 
@@ -199,6 +209,8 @@
   flex-direction: column;
 
   justify-content: center;
+
+  background: #111827;
 }
 
 
@@ -210,7 +222,7 @@
 .login-heading h2 {
   margin: 0 0 8px;
 
-  color: #172033;
+  color: #f8fafc;
 
   font-size: 30px;
 
@@ -221,7 +233,7 @@
 .login-heading p {
   margin: 0;
 
-  color: #64748b;
+  color: #94a3b8;
 
   font-size: 14px;
 }
@@ -236,13 +248,15 @@
 
   padding: 12px 14px;
 
-  border: 1px solid #fecaca;
+  border: 1px solid
+    rgba(248, 113, 113, 0.22);
 
   border-radius: 10px;
 
-  background: #fef2f2;
+  background:
+    rgba(239, 68, 68, 0.10);
 
-  color: #b91c1c;
+  color: #f87171;
 
   font-size: 14px;
 
@@ -273,7 +287,7 @@
 
 
 .form-group label {
-  color: #374151;
+  color: #e2e8f0;
 
   font-size: 14px;
 
@@ -288,39 +302,43 @@
 
   padding: 13px 15px;
 
-  border: 1px solid #e2e8f0;
+  border: 1px solid #334155;
 
   border-radius: 10px;
 
   outline: none;
 
-  background: #ffffff;
+  background: #0f172a;
 
-  color: #172033;
+  color: #f8fafc;
 
   font-size: 14px;
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 
 .form-group input::placeholder {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 
 .form-group input:hover {
-  border-color: #cbd5e1;
+  border-color: #475569;
 }
 
 
 .form-group input:focus {
-  border-color: #0f766e;
+  border-color: #14b8a6;
+
+  background: #0f172a;
 
   box-shadow:
-    0 0 0 4px rgba(20, 184, 166, 0.12);
+    0 0 0 4px
+    rgba(20, 184, 166, 0.10);
 }
 
 
@@ -369,20 +387,30 @@
   cursor: pointer;
 
   box-shadow:
-    0 8px 20px rgba(15, 118, 110, 0.22);
+    0 8px 20px
+    rgba(15, 118, 110, 0.22);
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
+    background 0.2s ease,
     opacity 0.2s ease;
 }
 
 
 .login-button:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      135deg,
+      #0d9488,
+      #14b8a6
+    );
+
   transform: translateY(-2px);
 
   box-shadow:
-    0 12px 25px rgba(15, 118, 110, 0.32);
+    0 12px 25px
+    rgba(20, 184, 166, 0.28);
 }
 
 
@@ -407,7 +435,7 @@
 
   text-align: center;
 
-  color: #64748b;
+  color: #94a3b8;
 
   font-size: 14px;
 }
@@ -416,7 +444,7 @@
 .register-prompt a {
   margin-left: 5px;
 
-  color: #0f766e;
+  color: #5eead4;
 
   text-decoration: none;
 
@@ -425,7 +453,7 @@
 
 
 .register-prompt a:hover {
-  color: #115e59;
+  color: #2dd4bf;
 
   text-decoration: underline;
 }
@@ -436,6 +464,7 @@
 ===================================================== */
 
 @media (max-width: 800px) {
+
   .auth-page {
     padding: 40px 20px;
   }
@@ -471,6 +500,7 @@
 ===================================================== */
 
 @media (max-width: 500px) {
+
   .auth-page {
     min-height: calc(100vh - 64px);
 

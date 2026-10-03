@@ -1,11 +1,11 @@
 /* =========================================
-   FAVORITES PAGE
+   FAVORITES PAGE — DARK THEME
 ========================================= */
 
 .favorites-page {
   min-height: 80vh;
 
-  background: #f5f7fb;
+  background: #0b1120;
 
   padding: 45px 20px 70px;
 }
@@ -15,6 +15,7 @@
 
   margin: 0 auto;
 }
+
 
 /* =========================================
    HEADER
@@ -35,7 +36,7 @@
 .favorites-label {
   margin: 0 0 7px;
 
-  color: #147d76;
+  color: #2dd4bf;
 
   font-size: 13px;
 
@@ -47,7 +48,7 @@
 .favorites-header h1 {
   margin: 0 0 8px;
 
-  color: #123b3a;
+  color: #f8fafc;
 
   font-size: 36px;
 }
@@ -55,7 +56,7 @@
 .favorites-header p {
   margin: 0;
 
-  color: #667085;
+  color: #94a3b8;
 
   font-size: 15px;
 }
@@ -65,9 +66,11 @@
 
   border-radius: 20px;
 
-  background: #e6f4f2;
+  background: rgba(20, 184, 166, 0.12);
 
-  color: #147d76;
+  border: 1px solid rgba(45, 212, 191, 0.15);
+
+  color: #5eead4;
 
   font-size: 14px;
 
@@ -75,6 +78,7 @@
 
   white-space: nowrap;
 }
+
 
 /* =========================================
    GRID
@@ -89,6 +93,7 @@
   gap: 22px;
 }
 
+
 /* =========================================
    CARD
 ========================================= */
@@ -96,28 +101,37 @@
 .favorite-card {
   overflow: hidden;
 
-  background: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      #111827,
+      #0f172a
+    );
 
-  border: 1px solid #e4e7ec;
+  border: 1px solid #273449;
 
   border-radius: 14px;
 
   box-shadow:
-    0 4px 15px
-    rgba(0, 0, 0, 0.06);
+    0 8px 25px
+    rgba(0, 0, 0, 0.25);
 
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .favorite-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+
+  border-color: #0d9488;
 
   box-shadow:
-    0 10px 25px
-    rgba(0, 0, 0, 0.10);
+    0 15px 35px
+    rgba(0, 0, 0, 0.4);
 }
+
 
 /* =========================================
    IMAGE
@@ -130,7 +144,12 @@
 
   overflow: hidden;
 
-  background: #d9f5ef;
+  background:
+    linear-gradient(
+      135deg,
+      #172033,
+      #0f292b
+    );
 }
 
 .favorite-card-image > img {
@@ -166,7 +185,7 @@
 
   gap: 7px;
 
-  color: #5b7188;
+  color: #94a3b8;
 }
 
 .favorite-image-fallback span {
@@ -180,6 +199,7 @@
 
   font-weight: 600;
 }
+
 
 /* =========================================
    PROPERTY TYPE
@@ -197,9 +217,12 @@
   border-radius: 20px;
 
   background:
-    rgba(255, 255, 255, 0.94);
+    rgba(15, 23, 42, 0.9);
 
-  color: #147d76;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+
+  color: #5eead4;
 
   font-size: 12px;
 
@@ -207,8 +230,9 @@
 
   box-shadow:
     0 4px 12px
-    rgba(0, 0, 0, 0.12);
+    rgba(0, 0, 0, 0.35);
 }
+
 
 /* =========================================
    REMOVE BUTTON
@@ -231,33 +255,38 @@
 
   justify-content: center;
 
-  border: none;
+  border: 1px solid
+    rgba(255, 255, 255, 0.15);
 
   border-radius: 50%;
 
-  background: #ffffff;
+  background:
+    rgba(15, 23, 42, 0.9);
 
-  color: #d92d20;
+  color: #fb7185;
 
   font-size: 21px;
 
   cursor: pointer;
 
   box-shadow:
-    0 4px 12px
-    rgba(0, 0, 0, 0.15);
+    0 5px 15px
+    rgba(0, 0, 0, 0.35);
 
   transition:
     transform 0.2s ease,
+    background 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .favorite-remove-button:hover {
   transform: scale(1.08);
 
+  background: #1e293b;
+
   box-shadow:
-    0 6px 16px
-    rgba(0, 0, 0, 0.20);
+    0 7px 18px
+    rgba(0, 0, 0, 0.45);
 }
 
 .favorite-remove-button:disabled {
@@ -265,6 +294,7 @@
 
   cursor: not-allowed;
 }
+
 
 /* =========================================
    CONTENT
@@ -289,7 +319,7 @@
 .favorite-card-top h2 {
   margin: 0;
 
-  color: #101828;
+  color: #f8fafc;
 
   font-size: 19px;
 
@@ -297,7 +327,7 @@
 }
 
 .favorite-price {
-  color: #147d76;
+  color: #2dd4bf;
 
   font-size: 19px;
 
@@ -309,7 +339,7 @@
 .favorite-price span {
   margin-left: 3px;
 
-  color: #667085;
+  color: #64748b;
 
   font-size: 12px;
 
@@ -319,10 +349,11 @@
 .favorite-location {
   margin: 0 0 16px;
 
-  color: #667085;
+  color: #94a3b8;
 
   font-size: 14px;
 }
+
 
 /* =========================================
    TAGS
@@ -343,14 +374,17 @@
 
   border-radius: 6px;
 
-  background: #f2f4f7;
+  background: #1e293b;
 
-  color: #475467;
+  border: 1px solid #334155;
+
+  color: #cbd5e1;
 
   font-size: 12px;
 
   font-weight: 600;
 }
+
 
 /* =========================================
    VIEW BUTTON
@@ -369,9 +403,9 @@
 
   text-decoration: none;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
-  background: #147d76;
+  background: #0d9488;
 
   color: #ffffff;
 
@@ -380,12 +414,21 @@
   font-weight: 600;
 
   transition:
-    background 0.2s ease;
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .favorite-view-button:hover {
-  background: #0f6862;
+  background: #14b8a6;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 18px
+    rgba(20, 184, 166, 0.2);
 }
+
 
 /* =========================================
    EMPTY / ERROR / LOADING
@@ -393,9 +436,14 @@
 
 .favorites-message,
 .favorites-empty {
-  background: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      #111827,
+      #0f172a
+    );
 
-  border: 1px solid #e4e7ec;
+  border: 1px solid #273449;
 
   border-radius: 14px;
 
@@ -404,14 +452,14 @@
   text-align: center;
 
   box-shadow:
-    0 4px 15px
-    rgba(0, 0, 0, 0.05);
+    0 8px 25px
+    rgba(0, 0, 0, 0.25);
 }
 
 .favorites-empty-icon {
   margin-bottom: 15px;
 
-  color: #147d76;
+  color: #2dd4bf;
 
   font-size: 60px;
 
@@ -421,7 +469,7 @@
 .favorites-empty h2 {
   margin: 0 0 8px;
 
-  color: #101828;
+  color: #f8fafc;
 
   font-size: 24px;
 }
@@ -429,18 +477,19 @@
 .favorites-empty p {
   margin: 0 0 22px;
 
-  color: #667085;
+  color: #94a3b8;
 
   font-size: 15px;
 }
 
 .favorites-error {
-  color: #b42318;
+  color: #fca5a5;
 
-  background: #fef3f2;
+  background: #2a1518;
 
-  border-color: #fecdca;
+  border-color: #7f1d1d;
 }
+
 
 /* =========================================
    PRIMARY BUTTON
@@ -451,9 +500,9 @@
 
   padding: 11px 20px;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
-  background: #147d76;
+  background: #0d9488;
 
   color: #ffffff;
 
@@ -464,29 +513,41 @@
   font-weight: 600;
 
   transition:
-    background 0.2s ease;
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .favorites-primary-button:hover {
-  background: #0f6862;
+  background: #14b8a6;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 18px
+    rgba(20, 184, 166, 0.2);
 }
+
 
 /* =========================================
    TABLET
 ========================================= */
 
 @media (max-width: 900px) {
+
   .favorites-grid {
     grid-template-columns:
       repeat(2, 1fr);
   }
 }
 
+
 /* =========================================
    MOBILE
 ========================================= */
 
 @media (max-width: 600px) {
+
   .favorites-page {
     padding: 30px 15px 50px;
   }

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import PropertySearch from "../components/PropertySearch";
 import "./Home.css";
 
 function HomePage() {
@@ -69,6 +70,7 @@ function HomePage() {
             </p>
 
             <div className="hero-stats">
+
               <div>
                 <strong>
                   PGs
@@ -98,6 +100,7 @@ function HomePage() {
                   Explore
                 </span>
               </div>
+
             </div>
 
             <Link
@@ -110,6 +113,15 @@ function HomePage() {
           </div>
 
         </div>
+
+        {/* ================================
+            PROPERTY SEARCH
+        ================================= */}
+
+        <div className="mt-10">
+          <PropertySearch />
+        </div>
+
       </section>
 
 

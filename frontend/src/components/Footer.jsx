@@ -1,135 +1,199 @@
 import { Link } from "react-router-dom";
-import "./Footer.css";
 
 function Footer() {
   return (
-    <footer className="footer">
+    <footer className="bg-slate-950 text-slate-300">
+      {/* Main Footer */}
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <Link
+              to="/"
+              className="inline-block text-2xl font-extrabold tracking-tight text-white transition hover:text-teal-400"
+            >
+              Stay<span className="text-teal-400">Sync</span>
+            </Link>
 
-      <div className="footer-container">
+            <p className="mt-5 max-w-sm text-sm leading-7 text-slate-400">
+              Find comfortable, affordable and suitable PGs, rooms and
+              stays for your next move.
+            </p>
 
-        {/* Brand */}
+            {/* Social Links */}
+            <div className="mt-6 flex items-center gap-3">
+              <a
+                href="#"
+                className="rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-400 transition hover:border-teal-500 hover:text-teal-400"
+              >
+                Instagram
+              </a>
 
-        <div className="footer-brand">
+              <a
+                href="#"
+                className="rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-400 transition hover:border-teal-500 hover:text-teal-400"
+              >
+                LinkedIn
+              </a>
 
-          <Link to="/" className="footer-logo">
-            <span className="footer-logo-icon">⌂</span>
-            <span>PG Finder</span>
-          </Link>
-
-          <p>
-            Find comfortable, affordable and
-            suitable PGs and rooms for your
-            next stay.
-          </p>
-
-          <div className="footer-socials">
-            <a href="#" aria-label="Instagram">
-              Instagram
-            </a>
-
-            <a href="#" aria-label="LinkedIn">
-              LinkedIn
-            </a>
-
-            <a href="#" aria-label="Twitter">
-              Twitter
-            </a>
+              <a
+                href="#"
+                className="rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-400 transition hover:border-teal-500 hover:text-teal-400"
+              >
+                Twitter
+              </a>
+            </div>
           </div>
 
+          {/* Explore */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Explore
+            </h3>
+
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link
+                  to="/properties"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Find PGs
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/properties"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Find Rooms
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/roommates"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Find Roommates
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/properties"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Popular Locations
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Company
+            </h3>
+
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  About Us
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Contact Us
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Help Center
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/owner/add-property"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  List Your Property
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Legal
+            </h3>
+
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Terms & Conditions
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Cookie Policy
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-slate-400 transition hover:text-teal-400"
+                >
+                  Safety Guidelines
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
+        {/* Bottom Section */}
+        <div className="mt-12 border-t border-slate-800 pt-7">
+          <div className="flex flex-col gap-4 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} StaySync. All rights reserved.
+            </p>
 
-        {/* Explore */}
-
-        <div className="footer-column">
-
-          <h3>Explore</h3>
-
-          <Link to="/">
-            Find PGs
-          </Link>
-
-          <Link to="/">
-            Find Rooms
-          </Link>
-
-          <Link to="/">
-            Find Roommates
-          </Link>
-
-          <Link to="/">
-            Popular Locations
-          </Link>
-
+            <p>
+              Made for students & professionals 🏠
+            </p>
+          </div>
         </div>
-
-
-        {/* Company */}
-
-        <div className="footer-column">
-
-          <h3>Company</h3>
-
-          <Link to="/">
-            About Us
-          </Link>
-
-          <Link to="/">
-            Contact Us
-          </Link>
-
-          <Link to="/">
-            Help Center
-          </Link>
-
-          <Link to="/">
-            List Your Property
-          </Link>
-
-        </div>
-
-
-        {/* Legal */}
-
-        <div className="footer-column">
-
-          <h3>Legal</h3>
-
-          <Link to="/">
-            Privacy Policy
-          </Link>
-
-          <Link to="/">
-            Terms & Conditions
-          </Link>
-
-          <Link to="/">
-            Cookie Policy
-          </Link>
-
-          <Link to="/">
-            Safety Guidelines
-          </Link>
-
-        </div>
-
       </div>
-
-
-      {/* Bottom */}
-
-      <div className="footer-bottom">
-
-        <div>
-          © 2026 PG Finder. All rights reserved.
-        </div>
-
-        <div>
-          Made for students & professionals 🏠
-        </div>
-
-      </div>
-
     </footer>
   );
 }

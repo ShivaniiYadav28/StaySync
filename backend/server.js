@@ -13,93 +13,67 @@ dotenv.config();
 const app = express();
 
 
-/* =====================================================
-   SECURITY MIDDLEWARE
-   ===================================================== */
+// --------------------------------------------------
+// Security Middleware
+// --------------------------------------------------
 
-app.use(
-  helmet()
-);
+app.use(helmet());
 
-
-/*
- * Allow frontend to communicate
- * with backend while supporting
- * refresh-token cookies.
- */
 app.use(
   cors({
     origin:
       process.env.CLIENT_URL ||
       "http://localhost:5173",
-
     credentials: true,
   })
 );
 
 
-/*
- * Parse JSON request bodies.
- */
+// --------------------------------------------------
+// Body Parsing
+// --------------------------------------------------
+
 app.use(
   express.json({
     limit: "1mb",
   })
 );
 
-
-/*
- * Parse cookies.
- */
-app.use(
-  cookieParser()
-);
+app.use(cookieParser());
 
 
-/* =====================================================
-   RATE LIMITING
-   ===================================================== */
+// --------------------------------------------------
+// Rate Limiting
+// --------------------------------------------------
 
-const apiLimiter =
-  rateLimit({
-    windowMs:
-      15 * 60 * 1000,
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
 
-    max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
 
-    standardHeaders: true,
+  message: {
+    success: false,
+    message:
+      "Too many requests. Please try again later.",
+  },
+});
 
-    legacyHeaders: false,
-
-    message: {
-      success: false,
-      message:
-        "Too many requests. Please try again later.",
-    },
-  });
+app.use("/api", apiLimiter);
 
 
-app.use(
-  "/api",
-  apiLimiter
-);
-
-
-/* =====================================================
-   DATABASE
-   ===================================================== */
+// --------------------------------------------------
+// Database
+// --------------------------------------------------
 
 connectDB();
 
 
-/* =====================================================
-   ROUTES
-   ===================================================== */
+// --------------------------------------------------
+// Routes
+// --------------------------------------------------
 
-
-/*
- * Authentication
- */
 const authRoutes =
   require("./routes/authRoutes");
 
@@ -109,9 +83,6 @@ app.use(
 );
 
 
-/*
- * Property
- */
 const propertyRoutes =
   require("./routes/propertyRoutes");
 
@@ -121,9 +92,6 @@ app.use(
 );
 
 
-/*
- * Favorites
- */
 const favoriteRoutes =
   require("./routes/favoriteRoutes");
 
@@ -133,9 +101,6 @@ app.use(
 );
 
 
-/*
- * Inquiries
- */
 const inquiryRoutes =
   require("./routes/inquiryRoutes");
 
@@ -145,9 +110,6 @@ app.use(
 );
 
 
-/*
- * Reviews
- */
 const reviewRoutes =
   require("./routes/reviewRoutes");
 
@@ -157,9 +119,6 @@ app.use(
 );
 
 
-/*
- * Notifications
- */
 const notificationRoutes =
   require("./routes/notificationRoutes");
 
@@ -169,9 +128,6 @@ app.use(
 );
 
 
-/*
- * Conversations / Messaging
- */
 const conversationRoutes =
   require("./routes/conversationRoutes");
 
@@ -181,9 +137,22 @@ app.use(
 );
 
 
-/* =====================================================
-   TEST ROUTE
-   ===================================================== */
+// --------------------------------------------------
+// Roommate Matching Routes
+// --------------------------------------------------
+
+const roommateRoutes =
+  require("./routes/roommateRoutes");
+
+app.use(
+  "/api/roommates",
+  roommateRoutes
+);
+
+
+// --------------------------------------------------
+// Health Check
+// --------------------------------------------------
 
 app.get(
   "/api/health",
@@ -197,9 +166,9 @@ app.get(
 );
 
 
-/* =====================================================
-   404 HANDLER
-   ===================================================== */
+// --------------------------------------------------
+// 404 Handler
+// --------------------------------------------------
 
 app.use(
   (req, res) => {
@@ -212,9 +181,9 @@ app.use(
 );
 
 
-/* =====================================================
-   GLOBAL ERROR HANDLER
-   ===================================================== */
+// --------------------------------------------------
+// Global Error Handler
+// --------------------------------------------------
 
 app.use(
   (
@@ -228,12 +197,10 @@ app.use(
       error
     );
 
-    /*
-     * Handle invalid JSON.
-     */
+
+    // Invalid JSON
     if (
-      error instanceof
-      SyntaxError &&
+      error instanceof SyntaxError &&
       error.status === 400 &&
       error.type ===
         "entity.parse.failed"
@@ -245,9 +212,8 @@ app.use(
       });
     }
 
-    /*
-     * Mongoose validation error.
-     */
+
+    // Mongoose validation error
     if (
       error instanceof
       mongoose.Error.ValidationError
@@ -256,17 +222,19 @@ app.use(
         success: false,
         message:
           "Validation error",
-        errors: Object.values(
-          error.errors
-        ).map(
-          (item) => item.message
-        ),
+
+        errors:
+          Object.values(
+            error.errors
+          ).map(
+            (item) =>
+              item.message
+          ),
       });
     }
 
-    /*
-     * Duplicate MongoDB key.
-     */
+
+    // Duplicate MongoDB record
     if (
       error?.code === 11000
     ) {
@@ -277,6 +245,8 @@ app.use(
       });
     }
 
+
+    // Default server error
     return res.status(500).json({
       success: false,
       message:
@@ -286,13 +256,12 @@ app.use(
 );
 
 
-/* =====================================================
-   SERVER
-   ===================================================== */
+// --------------------------------------------------
+// Start Server
+// --------------------------------------------------
 
 const PORT =
   process.env.PORT || 5000;
-
 
 app.listen(
   PORT,

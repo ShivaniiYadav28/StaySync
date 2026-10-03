@@ -1,11 +1,32 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 
 import api from "../services/api";
 
 import "./Properties.css";
 
+
 function Properties() {
+
+  /* =====================================================
+     URL SEARCH PARAMETERS
+  ===================================================== */
+
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+
+  /* =====================================================
+     PROPERTY DATA
+  ===================================================== */
+
   const [properties, setProperties] =
     useState([]);
 
@@ -15,93 +36,242 @@ function Properties() {
   const [error, setError] =
     useState("");
 
-  const [filters, setFilters] = useState({
-    search: "",
-    city: "",
-    propertyType: "",
-    gender: "",
-    roomType: "",
-    minRent: "",
-    maxRent: "",
-    availableOnly: false,
-  });
+
+  /* =====================================================
+     FILTER STATES
+  ===================================================== */
+
+  const [search, setSearch] =
+    useState(
+      searchParams.get("search") || ""
+    );
+
+  const [city, setCity] =
+    useState(
+      searchParams.get("city") || ""
+    );
+
+  const [propertyType, setPropertyType] =
+    useState(
+      searchParams.get("propertyType") || ""
+    );
+
+  const [gender, setGender] =
+    useState(
+      searchParams.get("gender") || ""
+    );
+
+  const [roomType, setRoomType] =
+    useState(
+      searchParams.get("roomType") || ""
+    );
+
+  const [minRent, setMinRent] =
+    useState(
+      searchParams.get("minRent") || ""
+    );
+
+  const [maxRent, setMaxRent] =
+    useState(
+      searchParams.get("maxRent") || ""
+    );
+
+  const [availableOnly, setAvailableOnly] =
+    useState(
+      searchParams.get("availableOnly") ===
+        "true"
+    );
+
+
+  /* =====================================================
+     SORTING
+  ===================================================== */
+
+  const [sort, setSort] =
+    useState(
+      searchParams.get("sort") || "newest"
+    );
+
+
+  /* =====================================================
+     PAGINATION
+  ===================================================== */
 
   const [page, setPage] =
+    useState(
+      Number(
+        searchParams.get("page")
+      ) || 1
+    );
+
+  const [totalPages, setTotalPages] =
     useState(1);
 
-  const [pagination, setPagination] =
-    useState({
-      currentPage: 1,
-      totalPages: 1,
-      totalProperties: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    });
 
-  // =====================================
-  // FAVORITES
-  // =====================================
+  /* =====================================================
+     FAVORITES
+  ===================================================== */
 
   const [favoriteIds, setFavoriteIds] =
-    useState(new Set());
+    useState([]);
 
-  const [favoriteLoading, setFavoriteLoading] =
-    useState({});
+  const [favoritesLoading, setFavoritesLoading] =
+    useState(false);
 
-  // =====================================
-  // FETCH PROPERTIES
-  // =====================================
+
+  /* =====================================================
+     FETCH FAVORITES
+  ===================================================== */
+
+  const fetchFavorites = async () => {
+
+    try {
+
+      const response =
+        await api.get("/favorites");
+
+      const favorites =
+        response.data?.favorites ||
+        response.data?.data ||
+        [];
+
+      const ids =
+        favorites.map(
+          (item) =>
+            item.property?._id ||
+            item.property ||
+            item._id
+        );
+
+      setFavoriteIds(ids);
+
+    } catch (error) {
+
+      console.error(
+        "Fetch favorites error:",
+        error
+      );
+
+    }
+  };
+
+
+  /* =====================================================
+     FETCH PROPERTIES
+  ===================================================== */
 
   const fetchProperties = async (
-    currentPage = 1
+    currentPage = page
   ) => {
+
     try {
+
       setLoading(true);
+
       setError("");
 
-      const params = {
-        page: currentPage,
-        limit: 12,
-      };
 
-      if (filters.search.trim()) {
+      const params = {};
+
+
+      /* Search */
+
+      if (search.trim()) {
+
         params.search =
-          filters.search.trim();
+          search.trim();
+
       }
 
-      if (filters.city.trim()) {
+
+      /* City */
+
+      if (city.trim()) {
+
         params.city =
-          filters.city.trim();
+          city.trim();
+
       }
 
-      if (filters.propertyType) {
+
+      /* Property Type */
+
+      if (propertyType) {
+
         params.propertyType =
-          filters.propertyType;
+          propertyType;
+
       }
 
-      if (filters.gender) {
+
+      /* Gender */
+
+      if (gender) {
+
         params.gender =
-          filters.gender;
+          gender;
+
       }
 
-      if (filters.roomType) {
+
+      /* Room Type */
+
+      if (roomType) {
+
         params.roomType =
-          filters.roomType;
+          roomType;
+
       }
 
-      if (filters.minRent !== "") {
+
+      /* Minimum Rent */
+
+      if (minRent) {
+
         params.minRent =
-          filters.minRent;
+          minRent;
+
       }
 
-      if (filters.maxRent !== "") {
+
+      /* Maximum Rent */
+
+      if (maxRent) {
+
         params.maxRent =
-          filters.maxRent;
+          maxRent;
+
       }
 
-      if (filters.availableOnly) {
-        params.availableOnly = "true";
+
+      /* Availability */
+
+      if (availableOnly) {
+
+        params.availableOnly =
+          true;
+
       }
+
+
+      /* Sorting */
+
+      if (
+        sort &&
+        sort !== "newest"
+      ) {
+
+        params.sort =
+          sort;
+
+      }
+
+
+      /* Pagination */
+
+      params.page =
+        currentPage;
+
 
       const response =
         await api.get(
@@ -111,882 +281,1487 @@ function Properties() {
           }
         );
 
+
+      const responseData =
+        response.data;
+
+
+      /*
+        Support different response
+        structures.
+      */
+
+      const propertyList =
+        responseData?.properties ||
+        responseData?.data?.properties ||
+        responseData?.data ||
+        [];
+
+
       setProperties(
-        response.data.properties || []
+        Array.isArray(propertyList)
+          ? propertyList
+          : []
       );
 
-      setPagination(
-        response.data.pagination || {
-          currentPage,
-          totalPages: 1,
-          totalProperties: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        }
+
+      /*
+        Pagination support
+      */
+
+      const pagination =
+        responseData?.pagination ||
+        responseData?.data?.pagination ||
+        {};
+
+
+      const backendTotalPages =
+        Number(
+          pagination.totalPages
+        ) || 1;
+
+
+      setTotalPages(
+        backendTotalPages
       );
+
 
       setPage(currentPage);
+
     } catch (error) {
+
       console.error(
-        "Failed to fetch properties:",
+        "Fetch properties error:",
         error
       );
+
 
       setError(
         error.response?.data?.message ||
-          "Failed to load properties."
+          "Unable to load properties."
       );
+
+
+      setProperties([]);
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
-  // =====================================
-  // FETCH FAVORITES
-  // =====================================
 
-  const fetchFavorites = async () => {
-    try {
-      const response =
-        await api.get(
-          "/favorites"
-        );
-
-      const favoritePropertyIds =
-        new Set(
-          (response.data.favorites || [])
-            .map(
-              (favorite) =>
-                favorite.property?._id
-            )
-            .filter(Boolean)
-        );
-
-      setFavoriteIds(
-        favoritePropertyIds
-      );
-    } catch (error) {
-      // A visitor who is not logged in
-      // should still be able to browse properties.
-      // Therefore, favorite loading errors
-      // are intentionally ignored here.
-      console.log(
-        "Favorites not loaded:",
-        error.response?.data?.message ||
-          error.message
-      );
-    }
-  };
-
-  // =====================================
-  // TOGGLE FAVORITE
-  // =====================================
-
-  const handleFavoriteToggle = async (
-    propertyId
-  ) => {
-    if (
-      favoriteLoading[propertyId]
-    ) {
-      return;
-    }
-
-    setFavoriteLoading(
-      (previous) => ({
-        ...previous,
-        [propertyId]: true,
-      })
-    );
-
-    try {
-      const isFavorite =
-        favoriteIds.has(propertyId);
-
-      if (isFavorite) {
-        await api.delete(
-          `/favorites/${propertyId}`
-        );
-
-        setFavoriteIds(
-          (previous) => {
-            const updated =
-              new Set(previous);
-
-            updated.delete(propertyId);
-
-            return updated;
-          }
-        );
-      } else {
-        await api.post(
-          `/favorites/${propertyId}`
-        );
-
-        setFavoriteIds(
-          (previous) => {
-            const updated =
-              new Set(previous);
-
-            updated.add(propertyId);
-
-            return updated;
-          }
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Failed to update favorite:",
-        error
-      );
-
-      if (
-        error.response?.status === 401
-      ) {
-        alert(
-          "Please login as a seeker to save properties."
-        );
-      } else if (
-        error.response?.status === 403
-      ) {
-        alert(
-          "Only seekers can save properties."
-        );
-      } else {
-        alert(
-          error.response?.data?.message ||
-            "Unable to update favorite."
-        );
-      }
-    } finally {
-      setFavoriteLoading(
-        (previous) => ({
-          ...previous,
-          [propertyId]: false,
-        })
-      );
-    }
-  };
-
-  // =====================================
-  // INITIAL LOAD
-  // =====================================
+  /* =====================================================
+     INITIAL LOAD
+  ===================================================== */
 
   useEffect(() => {
-    let isMounted = true;
 
-    const loadProperties =
-      async () => {
-        if (!isMounted) {
-          return;
-        }
+    fetchProperties(page);
 
-        await fetchProperties(1);
-      };
-
-    loadProperties();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // =====================================
-  // LOAD FAVORITES
-  // =====================================
-
-  useEffect(() => {
     fetchFavorites();
+
   }, []);
 
-  // =====================================
-  // HANDLE FILTER CHANGE
-  // =====================================
 
-  const handleChange = (e) => {
+  /* =====================================================
+     INPUT HANDLER
+  ===================================================== */
+
+  const handleChange = (
+    event
+  ) => {
+
     const {
       name,
       value,
       type,
       checked,
-    } = e.target;
+    } = event.target;
 
-    setFilters(
-      (previous) => ({
-        ...previous,
-        [name]:
-          type === "checkbox"
-            ? checked
-            : value,
-      })
-    );
+
+    if (type === "checkbox") {
+
+      setAvailableOnly(
+        checked
+      );
+
+      return;
+    }
+
+
+    if (name === "search") {
+
+      setSearch(value);
+
+    }
+
+
+    if (name === "city") {
+
+      setCity(value);
+
+    }
+
+
+    if (name === "propertyType") {
+
+      setPropertyType(value);
+
+    }
+
+
+    if (name === "gender") {
+
+      setGender(value);
+
+    }
+
+
+    if (name === "roomType") {
+
+      setRoomType(value);
+
+    }
+
+
+    if (name === "minRent") {
+
+      setMinRent(value);
+
+    }
+
+
+    if (name === "maxRent") {
+
+      setMaxRent(value);
+
+    }
+
+
+    if (name === "sort") {
+
+      setSort(value);
+
+    }
+
   };
 
-  // =====================================
-  // SEARCH
-  // =====================================
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  /* =====================================================
+     BUILD URL FROM FILTERS
+  ===================================================== */
+
+  const updateUrl = (
+    currentPage = 1
+  ) => {
+
+    const params =
+      new URLSearchParams();
+
+
+    if (search.trim()) {
+
+      params.set(
+        "search",
+        search.trim()
+      );
+
+    }
+
+
+    if (city.trim()) {
+
+      params.set(
+        "city",
+        city.trim()
+      );
+
+    }
+
+
+    if (propertyType) {
+
+      params.set(
+        "propertyType",
+        propertyType
+      );
+
+    }
+
+
+    if (gender) {
+
+      params.set(
+        "gender",
+        gender
+      );
+
+    }
+
+
+    if (roomType) {
+
+      params.set(
+        "roomType",
+        roomType
+      );
+
+    }
+
+
+    if (minRent) {
+
+      params.set(
+        "minRent",
+        minRent
+      );
+
+    }
+
+
+    if (maxRent) {
+
+      params.set(
+        "maxRent",
+        maxRent
+      );
+
+    }
+
+
+    if (availableOnly) {
+
+      params.set(
+        "availableOnly",
+        "true"
+      );
+
+    }
+
+
+    /* Sorting */
+
+    if (
+      sort &&
+      sort !== "newest"
+    ) {
+
+      params.set(
+        "sort",
+        sort
+      );
+
+    }
+
+
+    if (currentPage > 1) {
+
+      params.set(
+        "page",
+        String(currentPage)
+      );
+
+    }
+
+
+    setSearchParams(
+      params,
+      {
+        replace: true,
+      }
+    );
+
+  };
+
+
+  /* =====================================================
+     SEARCH
+  ===================================================== */
+
+  const handleSearch = async (
+    event
+  ) => {
+
+    event.preventDefault();
+
+    updateUrl(1);
 
     await fetchProperties(1);
+
   };
 
-  // =====================================
-  // CLEAR FILTERS
-  // =====================================
 
-  const handleClear = () => {
-    const emptyFilters = {
-      search: "",
-      city: "",
-      propertyType: "",
-      gender: "",
-      roomType: "",
-      minRent: "",
-      maxRent: "",
-      availableOnly: false,
-    };
+  /* =====================================================
+     CLEAR FILTERS
+  ===================================================== */
 
-    setFilters(emptyFilters);
+  const handleClear = async () => {
 
-    fetchPropertiesWithFilters(
-      emptyFilters,
-      1
+    setSearch("");
+
+    setCity("");
+
+    setPropertyType("");
+
+    setGender("");
+
+    setRoomType("");
+
+    setMinRent("");
+
+    setMaxRent("");
+
+    setAvailableOnly(false);
+
+    setSort("newest");
+
+    setPage(1);
+
+
+    setSearchParams(
+      {},
+      {
+        replace: true,
+      }
     );
-  };
 
-  // =====================================
-  // FETCH WITH CUSTOM FILTERS
-  // =====================================
 
-  const fetchPropertiesWithFilters =
-    async (
-      currentFilters,
-      currentPage = 1
-    ) => {
-      try {
-        setLoading(true);
-        setError("");
+    /*
+      Fetch all properties immediately.
+    */
 
-        const params = {
-          page: currentPage,
-          limit: 12,
-        };
+    try {
 
-        if (
-          currentFilters.search.trim()
-        ) {
-          params.search =
-            currentFilters.search.trim();
-        }
+      setLoading(true);
 
-        if (
-          currentFilters.city.trim()
-        ) {
-          params.city =
-            currentFilters.city.trim();
-        }
+      setError("");
 
-        if (
-          currentFilters.propertyType
-        ) {
-          params.propertyType =
-            currentFilters.propertyType;
-        }
 
-        if (
-          currentFilters.gender
-        ) {
-          params.gender =
-            currentFilters.gender;
-        }
-
-        if (
-          currentFilters.roomType
-        ) {
-          params.roomType =
-            currentFilters.roomType;
-        }
-
-        if (
-          currentFilters.minRent !== ""
-        ) {
-          params.minRent =
-            currentFilters.minRent;
-        }
-
-        if (
-          currentFilters.maxRent !== ""
-        ) {
-          params.maxRent =
-            currentFilters.maxRent;
-        }
-
-        if (
-          currentFilters.availableOnly
-        ) {
-          params.availableOnly =
-            "true";
-        }
-
-        const response =
-          await api.get(
-            "/properties",
-            {
-              params,
-            }
-          );
-
-        setProperties(
-          response.data.properties || []
-        );
-
-        setPagination(
-          response.data.pagination || {
-            currentPage,
-            totalPages: 1,
-            totalProperties: 0,
-            hasNextPage: false,
-            hasPreviousPage: false,
+      const response =
+        await api.get(
+          "/properties",
+          {
+            params: {
+              page: 1,
+            },
           }
         );
 
-        setPage(currentPage);
-      } catch (error) {
-        console.error(
-          "Failed to fetch properties:",
-          error
-        );
 
-        setError(
-          error.response?.data?.message ||
-            "Failed to load properties."
-        );
-      } finally {
-        setLoading(false);
-      }
+      const responseData =
+        response.data;
+
+
+      const propertyList =
+        responseData?.properties ||
+        responseData?.data?.properties ||
+        responseData?.data ||
+        [];
+
+
+      setProperties(
+        Array.isArray(propertyList)
+          ? propertyList
+          : []
+      );
+
+
+      const pagination =
+        responseData?.pagination ||
+        responseData?.data?.pagination ||
+        {};
+
+
+      setTotalPages(
+        Number(
+          pagination.totalPages
+        ) || 1
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Clear filters error:",
+        error
+      );
+
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to load properties."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  /* =====================================================
+     FILTER SEARCH
+  ===================================================== */
+
+  const fetchPropertiesWithFilters =
+    async () => {
+
+      await handleSearch({
+        preventDefault: () => {},
+      });
+
     };
 
-  // =====================================
-  // PREVIOUS PAGE
-  // =====================================
 
-  const handlePrevious = () => {
+  /* =====================================================
+     PAGINATION
+  ===================================================== */
+
+  const handlePageChange = async (
+    newPage
+  ) => {
+
     if (
-      pagination.hasPreviousPage
+      newPage < 1 ||
+      newPage > totalPages ||
+      newPage === page
     ) {
-      fetchProperties(page - 1);
+
+      return;
+
     }
+
+
+    setPage(newPage);
+
+    updateUrl(newPage);
+
+    await fetchProperties(
+      newPage
+    );
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
   };
 
-  // =====================================
-  // NEXT PAGE
-  // =====================================
 
-  const handleNext = () => {
-    if (
-      pagination.hasNextPage
-    ) {
-      fetchProperties(page + 1);
-    }
+  /* =====================================================
+     FAVORITE CHECK
+  ===================================================== */
+
+  const isFavorite = (
+    propertyId
+  ) => {
+
+    return favoriteIds.includes(
+      propertyId
+    );
+
   };
 
-  return (
-    <div className="properties-page">
-      <div className="properties-container">
 
-        {/* =================================
-            HEADER
-        ================================= */}
+  /* =====================================================
+     TOGGLE FAVORITE
+  ===================================================== */
 
-        <div className="properties-header">
-          <h1>
-            Find Your Perfect Stay
-          </h1>
+  const handleFavorite = async (
+    propertyId
+  ) => {
 
-          <p>
-            Search PGs, hostels, flats
-            and rooms that match your
-            needs.
-          </p>
+    if (favoritesLoading) {
+
+      return;
+
+    }
+
+
+    try {
+
+      setFavoritesLoading(true);
+
+
+      const alreadyFavorite =
+        isFavorite(propertyId);
+
+
+      if (alreadyFavorite) {
+
+        await api.delete(
+          `/favorites/${propertyId}`
+        );
+
+
+        setFavoriteIds(
+          (previous) =>
+            previous.filter(
+              (id) =>
+                id !== propertyId
+            )
+        );
+
+      } else {
+
+        await api.post(
+          `/favorites/${propertyId}`
+        );
+
+
+        setFavoriteIds(
+          (previous) => [
+            ...previous,
+            propertyId,
+          ]
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Favorite error:",
+        error
+      );
+
+
+      alert(
+        error.response?.data?.message ||
+          "Unable to update favorite."
+      );
+
+    } finally {
+
+      setFavoritesLoading(false);
+
+    }
+
+  };
+
+
+  /* =====================================================
+     PROPERTY IMAGE
+  ===================================================== */
+
+  const getPropertyImage = (
+    property
+  ) => {
+
+    if (
+      property.images &&
+      property.images.length > 0
+    ) {
+
+      const firstImage =
+        property.images[0];
+
+
+      if (
+        typeof firstImage ===
+        "string"
+      ) {
+
+        return firstImage;
+
+      }
+
+
+      return (
+        firstImage?.url ||
+        firstImage?.secure_url ||
+        ""
+      );
+
+    }
+
+
+    return "";
+
+  };
+
+
+  /* =====================================================
+     LOADING STATE
+  ===================================================== */
+
+  if (loading) {
+
+    return (
+
+      <div className="properties-page">
+
+        <div className="properties-loading">
+
+          Loading properties...
+
         </div>
 
-        {/* =================================
-            FILTERS
-        ================================= */}
+      </div>
+
+    );
+
+  }
+
+
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
+  return (
+
+    <div className="properties-page">
+
+      <div className="properties-container">
+
+
+        {/* =============================================
+            HEADER
+        ============================================= */}
+
+        <div className="properties-header">
+
+          <div>
+
+            <p className="properties-label">
+
+              STAYSYNC PROPERTIES
+
+            </p>
+
+
+            <h1>
+
+              Find Your Perfect Stay
+
+            </h1>
+
+
+            <span>
+
+              Explore PGs, rooms and
+              apartments that match
+              your needs.
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {/* =============================================
+            ERROR
+        ============================================= */}
+
+        {error && (
+
+          <div className="form-error">
+
+            {error}
+
+          </div>
+
+        )}
+
+
+        {/* =============================================
+            FILTER FORM
+        ============================================= */}
 
         <form
           className="property-filters"
           onSubmit={handleSearch}
         >
 
-          {/* SEARCH */}
 
-          <div className="filter-group search-group">
-            <label>
+          {/* Search */}
+
+          <div className="filter-group">
+
+            <label htmlFor="search">
+
               Search
+
             </label>
 
+
             <input
-              type="text"
+              id="search"
               name="search"
-              placeholder="Search city, area or property..."
-              value={filters.search}
+              type="text"
+              value={search}
               onChange={handleChange}
+              placeholder="Search properties..."
             />
+
           </div>
 
-          {/* CITY */}
+
+          {/* City */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="city">
+
               City
+
             </label>
+
 
             <input
-              type="text"
+              id="city"
               name="city"
-              placeholder="e.g. Bangalore"
-              value={filters.city}
+              type="text"
+              value={city}
               onChange={handleChange}
+              placeholder="Bangalore"
             />
+
           </div>
 
-          {/* PROPERTY TYPE */}
+
+          {/* Property Type */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="propertyType">
+
               Property Type
+
             </label>
+
 
             <select
+              id="propertyType"
               name="propertyType"
-              value={
-                filters.propertyType
-              }
+              value={propertyType}
               onChange={handleChange}
             >
+
               <option value="">
-                All
+
+                All Types
+
               </option>
+
 
               <option value="PG">
+
                 PG
+
               </option>
 
-              <option value="Hostel">
-                Hostel
-              </option>
-
-              <option value="Flat">
-                Flat
-              </option>
 
               <option value="Room">
+
                 Room
+
               </option>
+
+
+              <option value="Flat">
+
+                Flat
+
+              </option>
+
+
+              <option value="Hostel">
+
+                Hostel
+
+              </option>
+
             </select>
+
           </div>
 
-          {/* GENDER */}
+
+          {/* Gender */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="gender">
+
               Gender
+
             </label>
 
+
             <select
+              id="gender"
               name="gender"
-              value={filters.gender}
+              value={gender}
               onChange={handleChange}
             >
+
               <option value="">
-                Any
+
+                Any Gender
+
               </option>
+
 
               <option value="Male">
+
                 Male
+
               </option>
+
 
               <option value="Female">
+
                 Female
+
               </option>
+
 
               <option value="Any">
+
                 Any
+
               </option>
+
             </select>
+
           </div>
 
-          {/* ROOM TYPE */}
+
+          {/* Room Type */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="roomType">
+
               Room Type
+
             </label>
+
 
             <select
+              id="roomType"
               name="roomType"
-              value={filters.roomType}
+              value={roomType}
               onChange={handleChange}
             >
+
               <option value="">
-                All
+
+                Any Room
+
               </option>
+
 
               <option value="Single">
+
                 Single
+
               </option>
+
 
               <option value="Double">
+
                 Double
+
               </option>
+
 
               <option value="Triple">
+
                 Triple
+
               </option>
+
 
               <option value="Shared">
+
                 Shared
+
               </option>
+
             </select>
+
           </div>
 
-          {/* MIN RENT */}
+
+          {/* Minimum Rent */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="minRent">
+
               Min Rent
+
             </label>
 
+
             <input
-              type="number"
+              id="minRent"
               name="minRent"
-              placeholder="₹ Minimum"
+              type="number"
               min="0"
-              value={filters.minRent}
+              value={minRent}
               onChange={handleChange}
+              placeholder="₹5,000"
             />
+
           </div>
 
-          {/* MAX RENT */}
+
+          {/* Maximum Rent */}
 
           <div className="filter-group">
-            <label>
+
+            <label htmlFor="maxRent">
+
               Max Rent
+
             </label>
 
+
             <input
-              type="number"
+              id="maxRent"
               name="maxRent"
-              placeholder="₹ Maximum"
+              type="number"
               min="0"
-              value={filters.maxRent}
+              value={maxRent}
               onChange={handleChange}
+              placeholder="₹15,000"
             />
+
           </div>
 
-          {/* AVAILABLE */}
+
+          {/* Sort */}
+
+          <div className="filter-group">
+
+            <label htmlFor="sort">
+
+              Sort By
+
+            </label>
+
+
+            <select
+              id="sort"
+              name="sort"
+              value={sort}
+              onChange={handleChange}
+            >
+
+              <option value="newest">
+
+                Newest
+
+              </option>
+
+
+              <option value="rent_asc">
+
+                Rent: Low → High
+
+              </option>
+
+
+              <option value="rent_desc">
+
+                Rent: High → Low
+
+              </option>
+
+            </select>
+
+          </div>
+
+
+          {/* Available */}
 
           <div className="filter-checkbox">
+
             <label>
+
               <input
                 type="checkbox"
                 name="availableOnly"
-                checked={
-                  filters.availableOnly
-                }
+                checked={availableOnly}
                 onChange={handleChange}
               />
 
+
               <span>
-                Available rooms only
+
+                Available only
+
               </span>
+
             </label>
+
           </div>
 
-          {/* BUTTONS */}
+
+          {/* Buttons */}
 
           <div className="filter-actions">
+
             <button
               type="submit"
-              className="search-button"
+              className="filter-search-btn"
             >
+
               Search
+
             </button>
+
 
             <button
               type="button"
-              className="clear-button"
+              className="filter-clear-btn"
               onClick={handleClear}
             >
+
               Clear
+
             </button>
+
           </div>
+
+
         </form>
 
-        {/* =================================
-            RESULTS HEADER
-        ================================= */}
 
-        <div className="results-header">
+        {/* =============================================
+            RESULTS HEADER
+        ============================================= */}
+
+        <div className="properties-results-header">
+
           <h2>
-            Properties
+
+            {properties.length}{" "}
+
+            {properties.length === 1
+              ? "Property"
+              : "Properties"}{" "}
+
+            Found
+
           </h2>
 
-          <span>
-            {pagination.totalProperties}{" "}
-            properties found
-          </span>
-        </div>
 
-        {/* =================================
-            LOADING
-        ================================= */}
+          {(city ||
+            propertyType ||
+            gender ||
+            roomType ||
+            minRent ||
+            maxRent ||
+            availableOnly ||
+            search ||
+            sort !== "newest") && (
 
-        {loading && (
-          <div className="loading-message">
-            Loading properties...
-          </div>
-        )}
+            <p>
 
-        {/* =================================
-            ERROR
-        ================================= */}
+              Showing results based
+              on your filters.
 
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
+            </p>
 
-        {/* =================================
-            NO RESULTS
-        ================================= */}
-
-        {!loading &&
-          !error &&
-          properties.length === 0 && (
-            <div className="no-results">
-              <h3>
-                No properties found
-              </h3>
-
-              <p>
-                Try changing your
-                search filters.
-              </p>
-            </div>
           )}
 
-        {/* =================================
-            PROPERTY GRID
-        ================================= */}
+        </div>
 
-        {!loading &&
-          properties.length > 0 && (
-            <div className="properties-grid">
+
+        {/* =============================================
+            NO RESULTS
+        ============================================= */}
+
+        {properties.length === 0 ? (
+
+          <div className="empty-properties">
+
+            <div className="empty-icon">
+
+              🏠
+
+            </div>
+
+
+            <h2>
+
+              No properties found
+
+            </h2>
+
+
+            <p>
+
+              Try changing your filters
+              or search for another
+              location.
+
+            </p>
+
+
+            <button
+              type="button"
+              onClick={handleClear}
+            >
+
+              Clear Filters
+
+            </button>
+
+          </div>
+
+        ) : (
+
+          <>
+
+
+            {/* =========================================
+                PROPERTY GRID
+            ========================================= */}
+
+            <div className="property-grid">
 
               {properties.map(
                 (property) => {
 
-                  const coverImage =
-                    property.images?.length >
-                    0
-                      ? property.images[0].url
-                      : null;
+                  const propertyId =
+                    property._id ||
+                    property.id;
 
-                  const isFavorite =
-                    favoriteIds.has(
-                      property._id
+
+                  const image =
+                    getPropertyImage(
+                      property
                     );
 
-                  const isFavoriteLoading =
-                    favoriteLoading[
-                      property._id
-                    ];
 
                   return (
+
                     <div
                       className="property-card"
-                      key={property._id}
+                      key={propertyId}
                     >
 
-                      {/* PROPERTY IMAGE */}
 
-                      <div className="property-card-image">
+                      {/* Image */}
 
-                        {coverImage ? (
+                      <div className="property-image-wrapper">
+
+                        {image ? (
+
                           <img
-                            src={coverImage}
+                            src={image}
                             alt={
-                              property.title
+                              property.title ||
+                              "Property"
                             }
+                            className="property-image"
                           />
-                        ) : (
-                          <div className="property-card-image-fallback">
-                            <span>
-                              🏠
-                            </span>
 
-                            <p>
-                              No image available
-                            </p>
+                        ) : (
+
+                          <div className="property-image-placeholder">
+
+                            🏠
+
                           </div>
+
                         )}
 
-                        <span className="card-image-type">
-                          {
-                            property.propertyType
-                          }
-                        </span>
 
-                        {/* FAVORITE BUTTON */}
+                        {/* Property Type */}
+
+                        {property.propertyType && (
+
+                          <span className="property-type-badge">
+
+                            {
+                              property.propertyType
+                            }
+
+                          </span>
+
+                        )}
+
+
+                        {/* Favorite */}
 
                         <button
                           type="button"
                           className={`favorite-button ${
-                            isFavorite
-                              ? "favorite-active"
+                            isFavorite(
+                              propertyId
+                            )
+                              ? "active"
                               : ""
                           }`}
                           onClick={() =>
-                            handleFavoriteToggle(
-                              property._id
+                            handleFavorite(
+                              propertyId
                             )
                           }
-                          disabled={
-                            isFavoriteLoading
-                          }
                           aria-label={
-                            isFavorite
+                            isFavorite(
+                              propertyId
+                            )
                               ? "Remove from favorites"
                               : "Add to favorites"
                           }
-                          title={
-                            isFavorite
-                              ? "Remove from favorites"
-                              : "Save property"
-                          }
                         >
-                          {isFavorite
+
+                          {isFavorite(
+                            propertyId
+                          )
                             ? "♥"
                             : "♡"}
+
                         </button>
+
                       </div>
 
-                      {/* PROPERTY CONTENT */}
+
+                      {/* Card Content */}
 
                       <div className="property-card-content">
 
+
                         <div className="property-card-top">
 
-                          <span className="property-type">
-                            {
-                              property.propertyType
-                            }
-                          </span>
+                          <h2>
 
-                          <span className="property-gender">
                             {
-                              property.gender
+                              property.title ||
+                              "Untitled Property"
                             }
-                          </span>
+
+                          </h2>
+
+
+                          {property.gender && (
+
+                            <span className="property-gender">
+
+                              {
+                                property.gender
+                              }
+
+                            </span>
+
+                          )}
+
                         </div>
 
-                        <h3>
-                          {property.title}
-                        </h3>
+
+                        {/* Location */}
 
                         <p className="property-location">
-                          📍 {property.area},{" "}
-                          {property.city}
+
+                          📍{" "}
+
+                          {
+                            property.area ||
+                            property.locality ||
+                            property.city ||
+                            "Location unavailable"
+                          }
+
                         </p>
 
-                        <p className="property-room">
-                          🛏️{" "}
-                          {property.roomType}
-                        </p>
 
-                        <div className="property-price">
+                        {/* Rent */}
+
+                        <p className="property-rent">
+
                           ₹
+
                           {Number(
-                            property.rent
+                            property.rent ||
+                              property.monthlyRent ||
+                              0
                           ).toLocaleString(
                             "en-IN"
                           )}
 
-                          <span>
-                            / month
-                          </span>
-                        </div>
 
-                        <p className="property-availability">
-                          {property.availableRooms >
-                          0
-                            ? `${property.availableRooms} rooms available`
-                            : "Currently unavailable"}
+                          <span>
+
+                            / month
+
+                          </span>
+
                         </p>
 
+
+                        {/* Details */}
+
+                        <div className="property-meta">
+
+                          {property.roomType && (
+
+                            <span>
+
+                              🛏️{" "}
+
+                              {
+                                property.roomType
+                              }
+
+                            </span>
+
+                          )}
+
+
+                          {property.city && (
+
+                            <span>
+
+                              📍{" "}
+
+                              {
+                                property.city
+                              }
+
+                            </span>
+
+                          )}
+
+
+                          {property.available !==
+                            undefined && (
+
+                            <span>
+
+                              {property.available
+                                ? "Available"
+                                : "Not Available"}
+
+                            </span>
+
+                          )}
+
+                        </div>
+
+
+                        {/* View Button */}
+
                         <Link
-                          to={`/properties/${property._id}`}
-                          className="view-property-button"
+                          to={`/properties/${propertyId}`}
+                          className="view-property-btn"
                         >
-                          View Details
+
+                          View Property
+
                         </Link>
 
                       </div>
+
                     </div>
+
                   );
+
                 }
               )}
 
             </div>
-          )}
 
-        {/* =================================
-            PAGINATION
-        ================================= */}
 
-        {!loading &&
-          properties.length > 0 && (
-            <div className="pagination">
+            {/* =========================================
+                PAGINATION
+            ========================================= */}
 
-              <button
-                type="button"
-                onClick={
-                  handlePrevious
-                }
-                disabled={
-                  !pagination.hasPreviousPage
-                }
-              >
-                ← Previous
-              </button>
+            {totalPages > 1 && (
 
-              <span>
-                Page{" "}
-                {pagination.currentPage}{" "}
-                of{" "}
-                {pagination.totalPages}
-              </span>
+              <div className="pagination">
 
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={
-                  !pagination.hasNextPage
-                }
-              >
-                Next →
-              </button>
 
-            </div>
-          )}
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() =>
+                    handlePageChange(
+                      page - 1
+                    )
+                  }
+                >
+
+                  ← Previous
+
+                </button>
+
+
+                {Array.from(
+                  {
+                    length: totalPages,
+                  }
+                ).map(
+                  (_, index) =>
+                    index + 1
+                ).map(
+                  (pageNumber) => (
+
+                    <button
+                      type="button"
+                      key={pageNumber}
+                      className={
+                        page ===
+                        pageNumber
+                          ? "active"
+                          : ""
+                      }
+                      onClick={() =>
+                        handlePageChange(
+                          pageNumber
+                        )
+                      }
+                    >
+
+                      {pageNumber}
+
+                    </button>
+
+                  )
+                )}
+
+
+                <button
+                  type="button"
+                  disabled={
+                    page === totalPages
+                  }
+                  onClick={() =>
+                    handlePageChange(
+                      page + 1
+                    )
+                  }
+                >
+
+                  Next →
+
+                </button>
+
+              </div>
+
+            )}
+
+          </>
+
+        )}
 
       </div>
+
     </div>
+
   );
+
 }
+
 
 export default Properties;

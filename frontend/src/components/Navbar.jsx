@@ -10,13 +10,13 @@ import {
 } from "react-router-dom";
 
 import { useAuth } from "../context/useAuth";
-
 import api from "../services/api";
 
 import "./Navbar.css";
 
 
 function Navbar() {
+  const navigate = useNavigate();
 
   const {
     user,
@@ -24,219 +24,226 @@ function Navbar() {
     logout,
   } = useAuth();
 
-  const navigate = useNavigate();
-
 
   const [
     notifications,
     setNotifications,
   ] = useState([]);
 
-
   const [
     unreadCount,
     setUnreadCount,
   ] = useState(0);
 
-
   const [
-    showNotifications,
-    setShowNotifications,
+    notificationOpen,
+    setNotificationOpen,
   ] = useState(false);
 
-
   const [
-    notificationLoading,
-    setNotificationLoading,
+    mobileMenuOpen,
+    setMobileMenuOpen,
   ] = useState(false);
-
 
   const notificationRef =
     useRef(null);
 
 
-  /* =========================================
-     LOAD NOTIFICATIONS
-  ========================================= */
+  // ==================================================
+  // Load Notifications
+  // ==================================================
+
+  const fetchNotifications =
+    async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+
+      try {
+        const response =
+          await api.get(
+            "/notifications"
+          );
+
+        setNotifications(
+          response.data.notifications ||
+            []
+        );
+      } catch (error) {
+        console.error(
+          "Fetch notifications error:",
+          error
+        );
+      }
+    };
+
+
+  // ==================================================
+  // Load Unread Count
+  // ==================================================
+
+  const fetchUnreadCount =
+    async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+
+      try {
+        const response =
+          await api.get(
+            "/notifications/unread-count"
+          );
+
+        setUnreadCount(
+          response.data.unreadCount || 0
+        );
+      } catch (error) {
+        console.error(
+          "Fetch unread notification count error:",
+          error
+        );
+      }
+    };
+
+
+  // ==================================================
+  // Notification Loading
+  // ==================================================
 
   useEffect(() => {
-
     if (!isAuthenticated) {
+      setNotifications([]);
+      setUnreadCount(0);
       return;
     }
 
-    let isMounted = true;
+    fetchNotifications();
+    fetchUnreadCount();
 
-
-    const loadNotifications =
-      async () => {
-
-        try {
-
-          setNotificationLoading(true);
-
-          const response =
-            await api.get(
-              "/notifications"
-            );
-
-
-          if (!isMounted) {
-            return;
-          }
-
-
-          setNotifications(
-            response.data.notifications || []
-          );
-
-
-          setUnreadCount(
-            response.data.unreadCount || 0
-          );
-
-
-        } catch (error) {
-
-          if (!isMounted) {
-            return;
-          }
-
-          console.error(
-            "Failed to load notifications:",
-            error
-          );
-
-
-        } finally {
-
-          if (isMounted) {
-            setNotificationLoading(false);
-          }
-
-        }
-
-      };
-
-
-    loadNotifications();
-
+    const interval =
+      setInterval(() => {
+        fetchUnreadCount();
+      }, 30000);
 
     return () => {
-
-      isMounted = false;
-
+      clearInterval(interval);
     };
+  }, [
+    isAuthenticated,
+  ]);
 
-  }, [isAuthenticated]);
 
-
-  /* =========================================
-     CLOSE NOTIFICATION DROPDOWN
-  ========================================= */
+  // ==================================================
+  // Close Notification Dropdown
+  // ==================================================
 
   useEffect(() => {
-
     const handleClickOutside =
       (event) => {
-
         if (
           notificationRef.current &&
           !notificationRef.current.contains(
             event.target
           )
         ) {
-
-          setShowNotifications(false);
-
+          setNotificationOpen(
+            false
+          );
         }
-
       };
-
 
     document.addEventListener(
       "mousedown",
       handleClickOutside
     );
 
-
     return () => {
-
       document.removeEventListener(
         "mousedown",
         handleClickOutside
       );
-
     };
-
   }, []);
 
 
-  /* =========================================
-     MARK ONE NOTIFICATION AS READ
-  ========================================= */
+  // ==================================================
+  // Logout
+  // ==================================================
 
-  const markAsRead =
-    async (
-      notificationId
-    ) => {
-
+  const handleLogout =
+    async () => {
       try {
-
-        await api.patch(
-          `/notifications/${notificationId}/read`
+        await logout();
+      } catch (error) {
+        console.error(
+          "Logout error:",
+          error
         );
+      }
 
+      setMobileMenuOpen(false);
+      setNotificationOpen(false);
+
+      navigate("/login");
+    };
+
+
+  // ==================================================
+  // Mark Notification Read
+  // ==================================================
+
+  const markNotificationAsRead =
+    async (notification) => {
+      try {
+        if (!notification.isRead) {
+          await api.patch(
+            `/notifications/${notification._id}/read`
+          );
+        }
 
         setNotifications(
           (previous) =>
             previous.map(
-              (notification) =>
-                notification._id ===
-                notificationId
+              (item) =>
+                item._id ===
+                notification._id
                   ? {
-                      ...notification,
+                      ...item,
                       isRead: true,
                     }
-                  : notification
+                  : item
             )
         );
 
-
-        setUnreadCount(
-          (previous) =>
-            Math.max(
-              previous - 1,
-              0
-            )
-        );
-
+        if (!notification.isRead) {
+          setUnreadCount(
+            (previous) =>
+              Math.max(
+                0,
+                previous - 1
+              )
+          );
+        }
 
       } catch (error) {
-
         console.error(
-          "Failed to mark notification as read:",
+          "Mark notification read error:",
           error
         );
-
       }
-
     };
 
 
-  /* =========================================
-     MARK ALL NOTIFICATIONS AS READ
-  ========================================= */
+  // ==================================================
+  // Mark All Notifications Read
+  // ==================================================
 
   const markAllAsRead =
     async () => {
-
       try {
-
         await api.patch(
           "/notifications/read-all"
         );
-
 
         setNotifications(
           (previous) =>
@@ -248,167 +255,160 @@ function Navbar() {
             )
         );
 
-
         setUnreadCount(0);
 
-
       } catch (error) {
-
         console.error(
-          "Failed to mark all notifications as read:",
+          "Mark all notifications read error:",
           error
         );
-
       }
-
     };
 
 
-  /* =========================================
-     NOTIFICATION CLICK
-  ========================================= */
+  // ==================================================
+  // Notification Navigation
+  // ==================================================
 
   const handleNotificationClick =
-    async (
-      notification
-    ) => {
+    async (notification) => {
+      await markNotificationAsRead(
+        notification
+      );
 
-      if (!notification.isRead) {
+      setNotificationOpen(
+        false
+      );
 
-        await markAsRead(
-          notification._id
-        );
+      setMobileMenuOpen(
+        false
+      );
 
+
+      // New message
+      if (
+        notification.type ===
+        "new_message"
+      ) {
+        navigate("/messages");
+        return;
       }
 
 
-      setShowNotifications(false);
-
-
-      /*
-       * Property notification
-       */
+      // Property notification
       if (
         notification.property?._id
       ) {
-
         navigate(
           `/properties/${notification.property._id}`
         );
 
         return;
-
       }
 
-
-      /*
-       * New inquiry
-       */
       if (
-        notification.type ===
-          "new_inquiry" &&
-        user?.role === "owner"
+        notification.property
       ) {
-
         navigate(
-          "/owner/inquiries"
+          `/properties/${notification.property}`
         );
 
         return;
-
       }
 
 
-      /*
-       * Accepted / rejected inquiry
-       */
+      // Inquiry notification
       if (
-        (
-          notification.type ===
-            "inquiry_accepted" ||
-          notification.type ===
-            "inquiry_rejected"
-        ) &&
-        user?.role === "seeker"
+        notification.inquiry
       ) {
-
         navigate(
           "/my-inquiries"
         );
-
-        return;
-
       }
-
-
-      /*
-       * New message
-       */
-      if (
-        notification.type ===
-        "new_message"
-      ) {
-
-        navigate(
-          "/messages"
-        );
-
-      }
-
     };
 
 
-  /* =========================================
-     NOTIFICATION TIME
-  ========================================= */
+  // ==================================================
+  // Notification Time
+  // ==================================================
 
   const formatNotificationTime =
-    (
-      createdAt
-    ) => {
-
-      if (!createdAt) {
+    (date) => {
+      if (!date) {
         return "";
       }
 
+      const notificationDate =
+        new Date(date);
 
-      const date =
-        new Date(createdAt);
+      const now =
+        new Date();
 
+      const difference =
+        now.getTime() -
+        notificationDate.getTime();
 
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
+      const minutes =
+        Math.floor(
+          difference /
+            (1000 * 60)
+        );
 
-        return "";
-
+      if (minutes < 1) {
+        return "Just now";
       }
 
+      if (minutes < 60) {
+        return `${minutes}m ago`;
+      }
 
-      return date.toLocaleString(
+      const hours =
+        Math.floor(
+          minutes / 60
+        );
+
+      if (hours < 24) {
+        return `${hours}h ago`;
+      }
+
+      const days =
+        Math.floor(
+          hours / 24
+        );
+
+      if (days < 7) {
+        return `${days}d ago`;
+      }
+
+      return notificationDate.toLocaleDateString(
         "en-IN",
         {
           day: "numeric",
           month: "short",
-          hour: "numeric",
-          minute: "2-digit",
         }
       );
-
     };
 
 
-  /* =========================================
-     NOTIFICATION ICON
-  ========================================= */
+  // ==================================================
+  // Close Mobile Menu
+  // ==================================================
+
+  const closeMobileMenu =
+    () => {
+      setMobileMenuOpen(
+        false
+      );
+    };
+
+
+  // ==================================================
+  // Notification Icon
+  // ==================================================
 
   const getNotificationIcon =
     (type) => {
-
       switch (type) {
-
         case "new_inquiry":
           return "📩";
 
@@ -426,180 +426,244 @@ function Navbar() {
 
         default:
           return "🔔";
-
       }
-
-    };
-
-
-  /* =========================================
-     LOGOUT
-  ========================================= */
-
-  const handleLogout =
-    async () => {
-
-      setNotifications([]);
-
-      setUnreadCount(0);
-
-      setShowNotifications(false);
-
-      await logout();
-
     };
 
 
   return (
+    <header className="navbar">
 
-    <nav className="navbar">
+      <div className="navbar-container">
 
-      {/* =====================================
-          LOGO
-      ===================================== */}
+        {/* ==========================================
+            LOGO
+            ========================================== */}
 
-      <Link
-        to="/"
-        className="navbar-logo"
-      >
-        StaySync
-      </Link>
-
-
-      {/* =====================================
-          NAVIGATION LINKS
-      ===================================== */}
-
-      <div className="navbar-links">
-
-        <Link to="/">
-          Home
+        <Link
+          to="/"
+          className="navbar-logo"
+          onClick={
+            closeMobileMenu
+          }
+        >
+          StaySync
         </Link>
 
 
-        <Link to="/properties">
-          Find a Stay
-        </Link>
+        {/* ==========================================
+            DESKTOP NAVIGATION
+            ========================================== */}
+
+        <nav
+          className={`navbar-links ${
+            mobileMenuOpen
+              ? "navbar-links-mobile-open"
+              : ""
+          }`}
+        >
+
+          {/* ----------------------------------------
+              COMMON LINKS
+              ---------------------------------------- */}
+
+          <Link
+            to="/"
+            onClick={
+              closeMobileMenu
+            }
+          >
+            Home
+          </Link>
+
+          <Link
+            to="/properties"
+            onClick={
+              closeMobileMenu
+            }
+          >
+            Find a Stay
+          </Link>
 
 
-        {/* =================================
-            LOGGED OUT
-        ================================= */}
+          {/* ========================================
+              AUTHENTICATED NAVIGATION
+              ======================================== */}
 
-        {!isAuthenticated && (
-          <>
+          {isAuthenticated && (
+            <>
 
-            <Link to="/login">
-              Login
-            </Link>
+              {/* ------------------------------------
+                  SEEKER LINKS
+                  ------------------------------------ */}
 
+              {user?.role ===
+                "seeker" && (
+                <>
+                  <Link
+                    to="/favorites"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    Favorites
+                  </Link>
 
-            <Link to="/register">
-              Register
-            </Link>
+                  <Link
+                    to="/my-inquiries"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    My Inquiries
+                  </Link>
 
-          </>
-        )}
+                  <Link
+                    to="/roommates"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    Find Roommates
+                  </Link>
 
-
-        {/* =================================
-            LOGGED IN
-        ================================= */}
-
-        {isAuthenticated && (
-          <>
-
-            {/* ===============================
-                OWNER LINKS
-            =============================== */}
-
-            {user?.role === "owner" && (
-              <>
-
-                <Link to="/owner/my-properties">
-                  My Properties
-                </Link>
-
-
-                <Link to="/owner/inquiries">
-                  Inquiries
-                </Link>
-
-
-                {/* MESSAGE LINK */}
-
-                <Link
-                  to="/messages"
-                  className="navbar-message-link"
-                >
-                  <span className="navbar-message-icon">
-                    💬
-                  </span>
-
-                  <span>
+                  <Link
+                    to="/messages"
+                    className="navbar-message-link"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
                     Messages
-                  </span>
-                </Link>
-
-              </>
-            )}
+                  </Link>
+                </>
+              )}
 
 
-            {/* ===============================
-                SEEKER LINKS
-            =============================== */}
+              {/* ------------------------------------
+                  OWNER LINKS
+                  ------------------------------------ */}
 
-            {user?.role === "seeker" && (
-              <>
+              {user?.role ===
+                "owner" && (
+                <>
+                  <Link
+                    to="/owner/add-property"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    Add Property
+                  </Link>
 
-                <Link to="/properties">
-                  Explore
-                </Link>
+                  <Link
+                    to="/owner/my-properties"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    My Properties
+                  </Link>
 
+                  <Link
+                    to="/owner/inquiries"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    Inquiries
+                  </Link>
 
-                <Link to="/favorites">
-                  ♥ Favorites
-                </Link>
-
-
-                <Link to="/my-inquiries">
-                  My Inquiries
-                </Link>
-
-
-                {/* MESSAGE LINK */}
-
-                <Link
-                  to="/messages"
-                  className="navbar-message-link"
-                >
-                  <span className="navbar-message-icon">
-                    💬
-                  </span>
-
-                  <span>
+                  <Link
+                    to="/messages"
+                    className="navbar-message-link"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
                     Messages
-                  </span>
-                </Link>
-
-              </>
-            )}
+                  </Link>
+                </>
+              )}
 
 
-            {/* =================================
-                NOTIFICATION
-            ================================= */}
+              {/* ------------------------------------
+                  ADMIN LINKS
+                  ------------------------------------ */}
 
+              {user?.role ===
+                "admin" && (
+                <>
+                  <Link
+                    to="/messages"
+                    className="navbar-message-link"
+                    onClick={
+                      closeMobileMenu
+                    }
+                  >
+                    Messages
+                  </Link>
+                </>
+              )}
+
+            </>
+          )}
+
+
+          {/* ========================================
+              MOBILE AUTH ACTIONS
+              ======================================== */}
+
+          {!isAuthenticated && (
+            <div className="navbar-mobile-auth">
+
+              <Link
+                to="/login"
+                onClick={
+                  closeMobileMenu
+                }
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                onClick={
+                  closeMobileMenu
+                }
+              >
+                Register
+              </Link>
+
+            </div>
+          )}
+
+        </nav>
+
+
+        {/* ==========================================
+            RIGHT SIDE
+            ========================================== */}
+
+        <div className="navbar-actions">
+
+
+          {/* ========================================
+              NOTIFICATIONS
+              ======================================== */}
+
+          {isAuthenticated && (
             <div
-              className="notification-wrapper"
-              ref={notificationRef}
+              className="navbar-notification-wrapper"
+              ref={
+                notificationRef
+              }
             >
 
               <button
                 type="button"
-                className="notification-button"
+                className="navbar-notification-button"
                 onClick={() =>
-                  setShowNotifications(
+                  setNotificationOpen(
                     (previous) =>
                       !previous
                   )
@@ -607,54 +671,46 @@ function Navbar() {
                 aria-label="Notifications"
               >
 
-                🔔
+                <span className="notification-bell">
+                  🔔
+                </span>
 
-
-                {unreadCount > 0 && (
-
-                  <span className="notification-badge">
-
-                    {unreadCount > 99
+                {unreadCount >
+                  0 && (
+                  <span className="notification-count">
+                    {unreadCount >
+                    99
                       ? "99+"
                       : unreadCount}
-
                   </span>
-
                 )}
 
               </button>
 
 
-              {/* NOTIFICATION DROPDOWN */}
+              {/* ------------------------------------
+                  NOTIFICATION DROPDOWN
+                  ------------------------------------ */}
 
-              {showNotifications && (
-
+              {notificationOpen && (
                 <div className="notification-dropdown">
-
-                  {/* HEADER */}
 
                   <div className="notification-header">
 
                     <div>
-
                       <h3>
                         Notifications
                       </h3>
 
-
-                      {unreadCount > 0 && (
-
-                        <span>
-                          {unreadCount} unread
-                        </span>
-
-                      )}
-
+                      <span>
+                        {unreadCount > 0
+                          ? `${unreadCount} unread`
+                          : "All caught up"}
+                      </span>
                     </div>
 
-
-                    {unreadCount > 0 && (
-
+                    {unreadCount >
+                      0 && (
                       <button
                         type="button"
                         className="mark-all-button"
@@ -664,56 +720,40 @@ function Navbar() {
                       >
                         Mark all read
                       </button>
-
                     )}
 
                   </div>
 
 
-                  {/* LIST */}
-
                   <div className="notification-list">
 
-                    {notificationLoading ? (
-
-                      <div className="notification-empty">
-                        Loading notifications...
-                      </div>
-
-                    ) : notifications.length === 0 ? (
-
+                    {notifications.length ===
+                      0 ? (
                       <div className="notification-empty">
 
-                        <div className="empty-bell">
+                        <div>
                           🔔
                         </div>
 
-
                         <p>
-                          No notifications yet
+                          No notifications yet.
                         </p>
 
-
-                        <span>
-                          You're all caught up!
-                        </span>
-
                       </div>
-
                     ) : (
-
                       notifications.map(
-                        (notification) => (
-
+                        (
+                          notification
+                        ) => (
                           <button
+                            type="button"
                             key={
                               notification._id
                             }
-                            type="button"
                             className={`notification-item ${
-                              !notification.isRead
-                                ? "notification-unread"
-                                : ""
+                              notification.isRead
+                                ? "notification-read"
+                                : "notification-unread"
                             }`}
                             onClick={() =>
                               handleNotificationClick(
@@ -723,33 +763,18 @@ function Navbar() {
                           >
 
                             <div className="notification-icon">
-
                               {getNotificationIcon(
                                 notification.type
                               )}
-
                             </div>
-
 
                             <div className="notification-content">
 
-                              <div className="notification-title-row">
-
-                                <strong>
-                                  {
-                                    notification.title
-                                  }
-                                </strong>
-
-
-                                {!notification.isRead && (
-
-                                  <span className="notification-dot" />
-
-                                )}
-
-                              </div>
-
+                              <strong>
+                                {
+                                  notification.title
+                                }
+                              </strong>
 
                               <p>
                                 {
@@ -757,65 +782,103 @@ function Navbar() {
                                 }
                               </p>
 
-
-                              <span className="notification-time">
-
+                              <span>
                                 {formatNotificationTime(
                                   notification.createdAt
                                 )}
-
                               </span>
 
                             </div>
 
-                          </button>
+                            {!notification.isRead && (
+                              <span className="notification-unread-dot" />
+                            )}
 
+                          </button>
                         )
                       )
-
                     )}
 
                   </div>
 
                 </div>
-
               )}
 
             </div>
+          )}
 
 
-            {/* =================================
-                USER
-            ================================= */}
+          {/* ========================================
+              USER / AUTH AREA
+              ======================================== */}
 
-            <span className="navbar-user">
+          {isAuthenticated ? (
+            <div className="navbar-user-area">
 
-              Hi, {user?.name}
+              <span className="navbar-user-greeting">
+                Hi,{" "}
+                {user?.name ||
+                  "User"}
+              </span>
 
-            </span>
+              <button
+                type="button"
+                className="navbar-logout-button"
+                onClick={
+                  handleLogout
+                }
+              >
+                Logout
+              </button>
+
+            </div>
+          ) : (
+            <div className="navbar-desktop-auth">
+
+              <Link
+                to="/login"
+                className="navbar-login-link"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="navbar-register-link"
+              >
+                Register
+              </Link>
+
+            </div>
+          )}
 
 
-            {/* =================================
-                LOGOUT
-            ================================= */}
+          {/* ========================================
+              MOBILE MENU BUTTON
+              ======================================== */}
 
-            <button
-              type="button"
-              className="navbar-logout"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+          <button
+            type="button"
+            className="navbar-menu-button"
+            onClick={() =>
+              setMobileMenuOpen(
+                (previous) =>
+                  !previous
+              )
+            }
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen
+              ? "✕"
+              : "☰"}
+          </button>
 
-          </>
-        )}
+        </div>
 
       </div>
 
-    </nav>
-
+    </header>
   );
-
 }
 
 
