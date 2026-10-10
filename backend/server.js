@@ -1,37 +1,56 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
-const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 
-const connectDB = require("./config/db");
-
-dotenv.config();
+const authRoutes = require("./routes/authRoutes");
+const propertyRoutes = require("./routes/propertyRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
+const inquiryRoutes = require("./routes/inquiryRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const conversationRoutes = require("./routes/conversationRoutes");
+const roommateRoutes = require("./routes/roommateRoutes");
+const roommateRequestRoutes = require("./routes/roommateRequestRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
+const PORT = process.env.PORT || 5000;
 
-// --------------------------------------------------
-// Security Middleware
-// --------------------------------------------------
-
-app.use(helmet());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
 
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL ||
-      "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(
+        new Error("Not allowed by CORS")
+      );
+    },
     credentials: true,
   })
 );
 
-
-// --------------------------------------------------
-// Body Parsing
-// --------------------------------------------------
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 app.use(
   express.json({
@@ -41,233 +60,72 @@ app.use(
 
 app.use(cookieParser());
 
-
-// --------------------------------------------------
-// Rate Limiting
-// --------------------------------------------------
-
-const apiLimiter = rateLimit({
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
-
   standardHeaders: true,
   legacyHeaders: false,
-
-  message: {
-    success: false,
-    message:
-      "Too many requests. Please try again later.",
-  },
 });
 
-app.use("/api", apiLimiter);
+app.use(limiter);
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "StaySync API is running.",
+  });
+});
 
-// --------------------------------------------------
-// Database
-// --------------------------------------------------
-
-connectDB();
-
-
-// --------------------------------------------------
-// Routes
-// --------------------------------------------------
-
-const authRoutes =
-  require("./routes/authRoutes");
-
+app.use("/api/auth", authRoutes);
+app.use("/api/properties", propertyRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/inquiries", inquiryRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/roommates", roommateRoutes);
 app.use(
-  "/api/auth",
-  authRoutes
+  "/api/roommate-requests",
+  roommateRequestRoutes
 );
 
+app.use("/api/bookings", bookingRoutes);
 
-const propertyRoutes =
-  require("./routes/propertyRoutes");
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found.",
+  });
+});
 
-app.use(
-  "/api/properties",
-  propertyRoutes
-);
+app.use((err, req, res, next) => {
+  console.error("Server error:", err.message);
 
-
-const favoriteRoutes =
-  require("./routes/favoriteRoutes");
-
-app.use(
-  "/api/favorites",
-  favoriteRoutes
-);
-
-
-const inquiryRoutes =
-  require("./routes/inquiryRoutes");
-
-app.use(
-  "/api/inquiries",
-  inquiryRoutes
-);
-
-
-const reviewRoutes =
-  require("./routes/reviewRoutes");
-
-app.use(
-  "/api/reviews",
-  reviewRoutes
-);
-
-
-const notificationRoutes =
-  require("./routes/notificationRoutes");
-
-app.use(
-  "/api/notifications",
-  notificationRoutes
-);
-
-
-const conversationRoutes =
-  require("./routes/conversationRoutes");
-
-app.use(
-  "/api/conversations",
-  conversationRoutes
-);
-
-
-// --------------------------------------------------
-// Roommate Matching Routes
-// --------------------------------------------------
-
-const roommateRoutes =
-  require("./routes/roommateRoutes");
-
-app.use(
-  "/api/roommates",
-  roommateRoutes
-);
-
-
-// --------------------------------------------------
-// Health Check
-// --------------------------------------------------
-
-app.get(
-  "/api/health",
-  (req, res) => {
-    return res.status(200).json({
-      success: true,
-      message:
-        "StaySync API is running",
+  if (err.message === "Not allowed by CORS") {
+    return res.status(403).json({
+      message: "CORS policy blocked this request.",
     });
   }
-);
 
+  return res.status(500).json({
+    message: "Internal server error.",
+  });
+});
 
-// --------------------------------------------------
-// 404 Handler
-// --------------------------------------------------
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected");
 
-app.use(
-  (req, res) => {
-    return res.status(404).json({
-      success: false,
-      message:
-        "API route not found",
+    app.listen(PORT, () => {
+      console.log(
+        `StaySync server running on port ${PORT}`
+      );
     });
-  }
-);
-
-
-// --------------------------------------------------
-// Global Error Handler
-// --------------------------------------------------
-
-app.use(
-  (
-    error,
-    req,
-    res,
-    next
-  ) => {
+  })
+  .catch((error) => {
     console.error(
-      "Global server error:",
-      error
+      "MongoDB connection failed:",
+      error.message
     );
-
-
-    // Invalid JSON
-    if (
-      error instanceof SyntaxError &&
-      error.status === 400 &&
-      error.type ===
-        "entity.parse.failed"
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid JSON request body",
-      });
-    }
-
-
-    // Mongoose validation error
-    if (
-      error instanceof
-      mongoose.Error.ValidationError
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Validation error",
-
-        errors:
-          Object.values(
-            error.errors
-          ).map(
-            (item) =>
-              item.message
-          ),
-      });
-    }
-
-
-    // Duplicate MongoDB record
-    if (
-      error?.code === 11000
-    ) {
-      return res.status(409).json({
-        success: false,
-        message:
-          "Duplicate record",
-      });
-    }
-
-
-    // Default server error
-    return res.status(500).json({
-      success: false,
-      message:
-        "Internal server error",
-    });
-  }
-);
-
-
-// --------------------------------------------------
-// Start Server
-// --------------------------------------------------
-
-const PORT =
-  process.env.PORT || 5000;
-
-app.listen(
-  PORT,
-  () => {
-    console.log(
-      `StaySync server running on port ${PORT}`
-    );
-  }
-);
+    process.exit(1);
+  });

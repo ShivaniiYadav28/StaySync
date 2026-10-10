@@ -1,7 +1,61 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
 import api from "../services/api";
 import "./AddProperty.css";
+import "leaflet/dist/leaflet.css";
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+});
+
+function LocationMarker({ setLocation }) {
+  const [position, setPosition] = useState(null);
+
+  useMapEvents({
+    click(event) {
+      const latitude = event.latlng.lat;
+      const longitude = event.latlng.lng;
+
+      const newPosition = {
+        latitude,
+        longitude,
+      };
+
+      setPosition([
+        latitude,
+        longitude,
+      ]);
+
+      setLocation(newPosition);
+    },
+  });
+
+  if (
+    !position ||
+    !Array.isArray(position) ||
+    position.length !== 2 ||
+    !Number.isFinite(position[0]) ||
+    !Number.isFinite(position[1])
+  ) {
+    return null;
+  }
+
+  return <Marker position={position} />;
+}
 
 function AddProperty() {
   const navigate = useNavigate();
@@ -24,20 +78,23 @@ function AddProperty() {
     rules: "",
   });
 
+  const [location, setLocation] = useState({
+    latitude: null,
+    longitude: null,
+  });
+
   const [images, setImages] = useState([]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] =
-    useState("");
-
-  const [success, setSuccess] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
+  const defaultPosition = [
+    12.9716,
+    77.5946,
+  ];
 
   const handleChange = (event) => {
-    const { name, value } =
-      event.target;
+    const { name, value } = event.target;
 
     setForm((previous) => ({
       ...previous,
@@ -111,11 +168,27 @@ function AddProperty() {
     );
   };
 
+  const handleLocationSelect = (newLocation) => {
+    setLocation(newLocation);
+    setError("");
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     setError("");
     setSuccess("");
+
+    if (
+      !Number.isFinite(location.latitude) ||
+      !Number.isFinite(location.longitude)
+    ) {
+      setError(
+        "Please select your property location on the map."
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -143,10 +216,14 @@ function AddProperty() {
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean),
+
+        location: {
+          address: form.address,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        },
       };
 
-      // STEP 1:
-      // Create the property first
       const propertyResponse =
         await api.post(
           "/properties",
@@ -162,8 +239,6 @@ function AddProperty() {
         );
       }
 
-      // STEP 2:
-      // Upload images to Cloudinary
       if (images.length > 0) {
         const formData = new FormData();
 
@@ -356,6 +431,7 @@ function AddProperty() {
               name="address"
               value={form.address}
               onChange={handleChange}
+              placeholder="Enter complete property address"
               required
             />
           </label>
@@ -396,6 +472,121 @@ function AddProperty() {
               />
             </label>
 
+          </div>
+
+          <div
+            style={{
+              marginTop: "20px",
+              marginBottom: "30px",
+            }}
+          >
+            <h3>
+              Select Property Location
+            </h3>
+
+            <p
+              style={{
+                color: "#9ca3af",
+                marginBottom: "15px",
+              }}
+            >
+              Click anywhere on the map to
+              select the exact property
+              location.
+            </p>
+
+            <div
+              style={{
+                height: "400px",
+                width: "100%",
+                borderRadius: "12px",
+                overflow: "hidden",
+                border:
+                  "1px solid #374151",
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <MapContainer
+                center={defaultPosition}
+                zoom={12}
+                scrollWheelZoom={true}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                <LocationMarker
+                  setLocation={
+                    handleLocationSelect
+                  }
+                />
+              </MapContainer>
+            </div>
+
+            {Number.isFinite(
+              location.latitude
+            ) &&
+              Number.isFinite(
+                location.longitude
+              ) && (
+                <div
+                  style={{
+                    marginTop: "15px",
+                    padding: "14px",
+                    borderRadius: "10px",
+                    background:
+                      "#111827",
+                    border:
+                      "1px solid #374151",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#22d3ee",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Location selected
+                  </p>
+
+                  <p
+                    style={{
+                      margin:
+                        "8px 0 0",
+                      color: "#9ca3af",
+                      fontSize:
+                        "14px",
+                    }}
+                  >
+                    Latitude:{" "}
+                    {location.latitude.toFixed(
+                      6
+                    )}
+                  </p>
+
+                  <p
+                    style={{
+                      margin:
+                        "4px 0 0",
+                      color: "#9ca3af",
+                      fontSize:
+                        "14px",
+                    }}
+                  >
+                    Longitude:{" "}
+                    {location.longitude.toFixed(
+                      6
+                    )}
+                  </p>
+                </div>
+              )}
           </div>
 
           <h3>
@@ -449,7 +640,9 @@ function AddProperty() {
               <input
                 type="number"
                 name="availableRooms"
-                value={form.availableRooms}
+                value={
+                  form.availableRooms
+                }
                 onChange={handleChange}
                 min="0"
                 required
@@ -469,7 +662,8 @@ function AddProperty() {
             />
 
             <small>
-              Separate each amenity with a comma.
+              Separate each amenity with a
+              comma.
             </small>
           </label>
 
@@ -484,13 +678,10 @@ function AddProperty() {
             />
 
             <small>
-              Separate each rule with a comma.
+              Separate each rule with a
+              comma.
             </small>
           </label>
-
-          {/* ========================= */}
-          {/* PROPERTY IMAGE UPLOAD */}
-          {/* ========================= */}
 
           <div className="image-upload-section">
 
@@ -530,8 +721,6 @@ function AddProperty() {
               className="image-file-input"
             />
 
-            {/* IMAGE PREVIEWS */}
-
             {images.length > 0 && (
               <div className="image-preview-grid">
 
@@ -555,7 +744,9 @@ function AddProperty() {
                         type="button"
                         className="remove-image-button"
                         onClick={() =>
-                          removeImage(index)
+                          removeImage(
+                            index
+                          )
                         }
                       >
                         ×

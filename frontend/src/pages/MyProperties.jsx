@@ -1,248 +1,273 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import "./MyProperties.css";
 
-function MyProperties() {
+const MyProperties = () => {
   const [properties, setProperties] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadProperties = async () => {
-      try {
-        const response = await api.get(
-          "/properties/owner/my-properties"
-        );
-
-        if (isMounted) {
-          setProperties(
-            response.data.properties
-          );
-        }
-      } catch (error) {
-        console.error(error);
-
-        if (isMounted) {
-          setError(
-            error.response?.data?.message ||
-              "Unable to load your properties."
-          );
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadProperties();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const deleteProperty = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this property?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  const fetchMyProperties = async () => {
     try {
-      await api.delete(
-        `/properties/${id}`
+      setLoading(true);
+      setError("");
+
+      const response = await api.get(
+        "/properties/my-properties"
       );
 
-      setProperties((previous) =>
-        previous.filter(
-          (property) =>
-            property._id !== id
-        )
+      console.log(
+        "My Properties response:",
+        response.data
       );
-    } catch (error) {
-      console.error(error);
 
-      alert(
-        error.response?.data?.message ||
-          "Unable to delete property."
+      if (Array.isArray(response.data)) {
+        setProperties(response.data);
+      } else if (
+        Array.isArray(response.data.properties)
+      ) {
+        setProperties(response.data.properties);
+      } else {
+        setProperties([]);
+      }
+    } catch (err) {
+      console.error(
+        "Error fetching my properties:",
+        err
       );
+
+      console.error(
+        "Backend response:",
+        err.response?.data
+      );
+
+      if (err.response?.status === 401) {
+        setError(
+          "Your login session is invalid or expired. Please login again."
+        );
+      } else if (err.response?.status === 404) {
+        setError(
+          "My Properties API route was not found."
+        );
+      } else {
+        setError(
+          err.response?.data?.message ||
+            "Failed to load your properties."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="owner-state">
-        Loading your properties...
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchMyProperties();
+  }, []);
+
+  const handleAddProperty = () => {
+    window.location.href =
+      "/owner/add-property";
+  };
+
+  const handleViewProperty = (id) => {
+    window.location.href =
+      `/properties/${id}`;
+  };
+
+  const handleEditProperty = (id) => {
+    window.location.href =
+      `/owner/properties/${id}/edit`;
+  };
 
   return (
-    <div className="my-properties-page">
-      <div className="my-properties-container">
+    <div className="min-h-screen bg-[#080d1d] text-white">
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-        {/* ================================
-            HEADER
-        ================================= */}
+        <div className="mb-8">
+          <p className="text-cyan-400 font-semibold tracking-widest text-sm">
+            STAYSYNC OWNER
+          </p>
 
-        <div className="owner-header">
+          <h1 className="text-4xl font-bold mt-2">
+            My Properties
+          </h1>
 
-          <div>
-            <p>
-              STAYSYNC OWNER
-            </p>
-
-            <h1>
-              My Properties
-            </h1>
-
-            <span>
-              Manage the properties you
-              have listed on StaySync.
-            </span>
-          </div>
-
-          <Link
-            to="/owner/add-property"
-            className="add-property-btn"
-          >
-            + Add Property
-          </Link>
-
+          <p className="text-gray-400 mt-2">
+            Manage the properties you have listed on
+            StaySync.
+          </p>
         </div>
 
+        <button
+          onClick={handleAddProperty}
+          className="bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-lg font-semibold transition mb-8"
+        >
+          + Add Property
+        </button>
 
-        {/* ================================
-            ERROR
-        ================================= */}
-
-        {error && (
-          <div className="form-error">
-            {error}
+        {loading && (
+          <div className="bg-[#11182b] border border-gray-700 rounded-xl p-8 text-center">
+            <p className="text-gray-400">
+              Loading your properties...
+            </p>
           </div>
         )}
 
+        {!loading && error && (
+          <div className="bg-red-950/30 border border-red-500/40 rounded-xl p-5">
+            <p className="text-red-400">
+              {error}
+            </p>
+          </div>
+        )}
 
-        {/* ================================
-            EMPTY STATE
-        ================================= */}
-
-        {!error &&
+        {!loading &&
+          !error &&
           properties.length === 0 && (
-            <div className="empty-properties">
-
-              <h2>
-                No properties yet
+            <div className="bg-[#11182b] border border-gray-700 rounded-xl p-10 text-center">
+              <h2 className="text-xl font-semibold mb-2">
+                No Properties Found
               </h2>
 
-              <p>
-                Add your first property
-                to start receiving
-                inquiries.
+              <p className="text-gray-400 mb-6">
+                You haven't listed any properties yet.
               </p>
 
-              <Link
-                to="/owner/add-property"
-                className="add-property-btn"
+              <button
+                onClick={handleAddProperty}
+                className="bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-lg font-semibold"
               >
-                Add Property
-              </Link>
+                + Add Your First Property
+              </button>
+            </div>
+          )}
+
+        {!loading &&
+          !error &&
+          properties.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              {properties.map((property) => (
+                <div
+                  key={property._id}
+                  className="bg-[#11182b] border border-gray-700 rounded-xl overflow-hidden shadow-lg"
+                >
+
+                  <div className="w-full h-64 bg-gray-800">
+
+                    {property.images &&
+                    property.images.length > 0 &&
+                    property.images[0].url ? (
+                      <img
+                        src={property.images[0].url}
+                        alt={
+                          property.title ||
+                          "Property"
+                        }
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error(
+                            "Image failed to load:",
+                            property.images[0].url
+                          );
+
+                          e.currentTarget.style.display =
+                            "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-gray-500">
+                          No Image Available
+                        </span>
+                      </div>
+                    )}
+
+                  </div>
+
+                  <div className="p-5">
+
+                    <h2 className="text-xl font-bold mb-2">
+                      {property.title ||
+                        "Untitled Property"}
+                    </h2>
+
+                    <p className="text-gray-400 mb-2">
+                      📍{" "}
+                      {property.area
+                        ? `${property.area}, `
+                        : ""}
+                      {property.city || ""}
+                    </p>
+
+                    <p className="text-gray-400 mb-2">
+                      🏠{" "}
+                      {property.propertyType ||
+                        "Property"}
+                    </p>
+
+                    {property.gender && (
+                      <p className="text-gray-400 mb-2">
+                        👤 Suitable for:{" "}
+                        {property.gender}
+                      </p>
+                    )}
+
+                    {property.roomType && (
+                      <p className="text-gray-400 mb-2">
+                        🛏️{" "}
+                        {property.roomType}
+                      </p>
+                    )}
+
+                    <p className="text-cyan-400 font-semibold text-lg mt-3">
+                      ₹{property.rent}
+                      <span className="text-gray-400 text-sm font-normal">
+                        {" "}
+                        / month
+                      </span>
+                    </p>
+
+                    <p className="text-gray-400 text-sm mt-2">
+                      Available rooms:{" "}
+                      {property.availableRooms ??
+                        0}
+                    </p>
+
+                    <div className="flex gap-3 mt-5">
+
+                      <button
+                        onClick={() =>
+                          handleViewProperty(
+                            property._id
+                          )
+                        }
+                        className="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded-lg font-semibold transition"
+                      >
+                        View
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleEditProperty(
+                            property._id
+                          )
+                        }
+                        className="flex-1 bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg font-semibold transition"
+                      >
+                        Edit
+                      </button>
+
+                    </div>
+                  </div>
+                </div>
+              ))}
 
             </div>
           )}
 
-
-        {/* ================================
-            PROPERTY CARDS
-        ================================= */}
-
-        <div className="owner-property-grid">
-
-          {properties.map((property) => (
-            <div
-              className="owner-property-card"
-              key={property._id}
-            >
-
-              <div className="owner-property-top">
-
-                <span>
-                  {property.propertyType}
-                </span>
-
-                <span
-                  className={
-                    property.isActive
-                      ? "active"
-                      : "inactive"
-                  }
-                >
-                  {property.isActive
-                    ? "Active"
-                    : "Inactive"}
-                </span>
-
-              </div>
-
-
-              <h2>
-                {property.title}
-              </h2>
-
-
-              <p>
-                📍 {property.area},{" "}
-                {property.city}
-              </p>
-
-
-              <strong>
-                ₹{property.rent}/month
-              </strong>
-
-
-              <p>
-                {property.availableRooms}{" "}
-                available rooms
-              </p>
-
-
-              <div className="owner-actions">
-
-                <Link
-                  to={`/properties/${property._id}`}
-                >
-                  View
-                </Link>
-
-                <button
-                  onClick={() =>
-                    deleteProperty(
-                      property._id
-                    )
-                  }
-                >
-                  Delete
-                </button>
-
-              </div>
-
-            </div>
-          ))}
-
-        </div>
-
       </div>
     </div>
   );
-}
+};
 
 export default MyProperties;

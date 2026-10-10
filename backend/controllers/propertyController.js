@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
-
 const Property = require("../models/Property");
-
-
-// =====================================
-// CREATE PROPERTY
-// =====================================
+const cloudinary = require("../config/cloudinary");
 
 const createProperty = async (req, res) => {
   try {
@@ -29,11 +24,6 @@ const createProperty = async (req, res) => {
       rules,
     } = body;
 
-
-    // =====================================
-    // REQUIRED FIELD VALIDATION
-    // =====================================
-
     if (
       !title ||
       !description ||
@@ -50,15 +40,9 @@ const createProperty = async (req, res) => {
       availableRooms === undefined
     ) {
       return res.status(400).json({
-        message:
-          "Please provide all required property details.",
+        message: "Please provide all required property details.",
       });
     }
-
-
-    // =====================================
-    // STRING VALIDATION
-    // =====================================
 
     const stringFields = {
       title,
@@ -69,9 +53,7 @@ const createProperty = async (req, res) => {
       pincode,
     };
 
-    for (const [field, value] of Object.entries(
-      stringFields
-    )) {
+    for (const [field, value] of Object.entries(stringFields)) {
       if (typeof value !== "string") {
         return res.status(400).json({
           message: `${field} must be a string.`,
@@ -85,25 +67,10 @@ const createProperty = async (req, res) => {
       }
     }
 
-
-    // =====================================
-    // NUMBER CONVERSION
-    // =====================================
-
     const rentNumber = Number(rent);
-
     const depositNumber = Number(deposit);
-
-    const totalRoomsNumber =
-      Number(totalRooms);
-
-    const availableRoomsNumber =
-      Number(availableRooms);
-
-
-    // =====================================
-    // NUMBER VALIDATION
-    // =====================================
+    const totalRoomsNumber = Number(totalRooms);
+    const availableRoomsNumber = Number(availableRooms);
 
     if (
       !Number.isFinite(rentNumber) ||
@@ -112,242 +79,127 @@ const createProperty = async (req, res) => {
       !Number.isFinite(availableRoomsNumber)
     ) {
       return res.status(400).json({
-        message:
-          "Rent, deposit and room values must be valid numbers.",
+        message: "Rent, deposit and room values must be valid numbers.",
       });
     }
 
-
-    if (
-      rentNumber < 0 ||
-      depositNumber < 0
-    ) {
+    if (rentNumber < 0 || depositNumber < 0) {
       return res.status(400).json({
-        message:
-          "Rent and deposit cannot be negative.",
+        message: "Rent and deposit cannot be negative.",
       });
     }
-
 
     if (
       !Number.isInteger(totalRoomsNumber) ||
       !Number.isInteger(availableRoomsNumber)
     ) {
       return res.status(400).json({
-        message:
-          "Room counts must be whole numbers.",
+        message: "Room counts must be whole numbers.",
       });
     }
-
 
     if (totalRoomsNumber < 1) {
       return res.status(400).json({
-        message:
-          "Total rooms must be at least 1.",
+        message: "Total rooms must be at least 1.",
       });
     }
-
 
     if (availableRoomsNumber < 0) {
       return res.status(400).json({
-        message:
-          "Available rooms cannot be negative.",
+        message: "Available rooms cannot be negative.",
       });
     }
 
-
-    if (
-      availableRoomsNumber >
-      totalRoomsNumber
-    ) {
+    if (availableRoomsNumber > totalRoomsNumber) {
       return res.status(400).json({
-        message:
-          "Available rooms cannot exceed total rooms.",
+        message: "Available rooms cannot exceed total rooms.",
       });
     }
-
-
-    // =====================================
-    // PINCODE VALIDATION
-    // =====================================
 
     const cleanPincode = pincode.trim();
 
     if (!/^\d{6}$/.test(cleanPincode)) {
       return res.status(400).json({
-        message:
-          "Pincode must contain exactly 6 digits.",
+        message: "Pincode must contain exactly 6 digits.",
       });
     }
 
-
-    // =====================================
-    // ARRAY VALIDATION
-    // =====================================
-
-    if (
-      amenities !== undefined &&
-      !Array.isArray(amenities)
-    ) {
+    if (amenities !== undefined && !Array.isArray(amenities)) {
       return res.status(400).json({
-        message:
-          "Amenities must be an array.",
+        message: "Amenities must be an array.",
       });
     }
 
-
-    if (
-      rules !== undefined &&
-      !Array.isArray(rules)
-    ) {
+    if (rules !== undefined && !Array.isArray(rules)) {
       return res.status(400).json({
-        message:
-          "Rules must be an array.",
+        message: "Rules must be an array.",
       });
     }
-
-
-    // =====================================
-    // AUTHENTICATION CHECK
-    // =====================================
 
     if (!req.user || !req.user.userId) {
       return res.status(401).json({
-        message:
-          "Authentication information is missing.",
+        message: "Authentication information is missing.",
       });
     }
 
-
-    // =====================================
-    // CREATE PROPERTY
-    // =====================================
-
     const property = await Property.create({
       title: title.trim(),
-
       description: description.trim(),
-
       propertyType,
-
       gender,
-
       address: address.trim(),
-
       area: area.trim(),
-
       city: city.trim(),
-
       pincode: cleanPincode,
-
       rent: rentNumber,
-
       deposit: depositNumber,
-
       roomType,
-
       totalRooms: totalRoomsNumber,
-
       availableRooms: availableRoomsNumber,
-
-      amenities: Array.isArray(amenities)
-        ? amenities
-        : [],
-
-      rules: Array.isArray(rules)
-        ? rules
-        : [],
-
+      amenities: Array.isArray(amenities) ? amenities : [],
+      rules: Array.isArray(rules) ? rules : [],
       owner: req.user.userId,
     });
 
-
     return res.status(201).json({
-      message:
-        "Property created successfully.",
-
+      message: "Property created successfully.",
       property,
     });
-
-
   } catch (error) {
-    console.error(
-      "Create property error:",
-      error.message
-    );
+    console.error("Create property error:", error);
 
-
-    // =====================================
-    // MONGOOSE VALIDATION ERROR
-    // =====================================
-
-    if (
-      error.name === "ValidationError"
-    ) {
-      const errors = Object.values(
-        error.errors
-      ).map((item) => ({
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((item) => ({
         field: item.path,
         message: item.message,
       }));
 
       return res.status(400).json({
-        message:
-          "Property validation failed.",
-
+        message: "Property validation failed.",
         errors,
       });
     }
 
-
-    // =====================================
-    // INVALID OBJECT ID
-    // =====================================
-
     if (error.name === "CastError") {
       return res.status(400).json({
-        message:
-          "Invalid property data.",
+        message: "Invalid property data.",
       });
     }
-
-
-    // =====================================
-    // DUPLICATE KEY
-    // =====================================
 
     if (error.code === 11000) {
       return res.status(409).json({
-        message:
-          "A property with these details already exists.",
+        message: "A property with these details already exists.",
       });
     }
 
-
-    // =====================================
-    // UNKNOWN ERROR
-    // =====================================
-
     return res.status(500).json({
-      message:
-        "Something went wrong.",
+      message: error.message || "Something went wrong.",
     });
   }
 };
 
-
-// =====================================
-// GET ALL PROPERTIES
-// SEARCH + FILTER + SORT + PAGINATION
-// =====================================
-
 const getProperties = async (req, res) => {
   try {
-
-    // =====================================
-    // QUERY PARAMETERS
-    // =====================================
-
     const {
       search,
       city,
@@ -360,31 +212,19 @@ const getProperties = async (req, res) => {
       minDeposit,
       maxDeposit,
       availableOnly,
-      sort,
+      sort = "newest",
       page = 1,
       limit = 12,
     } = req.query;
 
-
-    // =====================================
-    // PAGINATION VALIDATION
-    // =====================================
-
     const pageNumber = Number(page);
-
     const limitNumber = Number(limit);
 
-
-    if (
-      !Number.isInteger(pageNumber) ||
-      pageNumber < 1
-    ) {
+    if (!Number.isInteger(pageNumber) || pageNumber < 1) {
       return res.status(400).json({
-        message:
-          "Page must be a positive integer.",
+        message: "Page must be a positive integer.",
       });
     }
-
 
     if (
       !Number.isInteger(limitNumber) ||
@@ -392,118 +232,74 @@ const getProperties = async (req, res) => {
       limitNumber > 50
     ) {
       return res.status(400).json({
-        message:
-          "Limit must be between 1 and 50.",
+        message: "Limit must be between 1 and 50.",
       });
     }
 
-
-    // =====================================
-    // HELPER: ESCAPE REGEX
-    // =====================================
-
     const escapeRegex = (value) => {
-      return value.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
-      );
+      return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
-
-
-    // =====================================
-    // BUILD FILTER
-    // =====================================
 
     const filter = {
       isActive: true,
     };
 
-
-    // =====================================
-    // SEARCH
-    // =====================================
-
     if (
       search &&
-      typeof search === "string"
+      typeof search === "string" &&
+      search.trim()
     ) {
-      const cleanSearch =
-        search.trim();
+      const safeSearch = escapeRegex(search.trim());
 
-      if (cleanSearch) {
-        const safeSearch =
-          escapeRegex(cleanSearch);
-
-        filter.$or = [
-          {
-            title: {
-              $regex: safeSearch,
-              $options: "i",
-            },
+      filter.$or = [
+        {
+          title: {
+            $regex: safeSearch,
+            $options: "i",
           },
-
-          {
-            description: {
-              $regex: safeSearch,
-              $options: "i",
-            },
+        },
+        {
+          description: {
+            $regex: safeSearch,
+            $options: "i",
           },
-
-          {
-            area: {
-              $regex: safeSearch,
-              $options: "i",
-            },
+        },
+        {
+          area: {
+            $regex: safeSearch,
+            $options: "i",
           },
-
-          {
-            city: {
-              $regex: safeSearch,
-              $options: "i",
-            },
+        },
+        {
+          city: {
+            $regex: safeSearch,
+            $options: "i",
           },
-        ];
-      }
+        },
+      ];
     }
-
-
-    // =====================================
-    // CITY
-    // =====================================
 
     if (
       city &&
-      typeof city === "string"
+      typeof city === "string" &&
+      city.trim()
     ) {
       filter.city = {
-        $regex: escapeRegex(
-          city.trim()
-        ),
+        $regex: escapeRegex(city.trim()),
         $options: "i",
       };
     }
-
-
-    // =====================================
-    // AREA
-    // =====================================
 
     if (
       area &&
-      typeof area === "string"
+      typeof area === "string" &&
+      area.trim()
     ) {
       filter.area = {
-        $regex: escapeRegex(
-          area.trim()
-        ),
+        $regex: escapeRegex(area.trim()),
         $options: "i",
       };
     }
-
-
-    // =====================================
-    // PROPERTY TYPE
-    // =====================================
 
     const allowedPropertyTypes = [
       "PG",
@@ -512,29 +308,15 @@ const getProperties = async (req, res) => {
       "Room",
     ];
 
-
     if (propertyType) {
-
-      if (
-        !allowedPropertyTypes.includes(
-          propertyType
-        )
-      ) {
+      if (!allowedPropertyTypes.includes(propertyType)) {
         return res.status(400).json({
-          message:
-            "Invalid property type.",
+          message: "Invalid property type.",
         });
       }
 
-
-      filter.propertyType =
-        propertyType;
+      filter.propertyType = propertyType;
     }
-
-
-    // =====================================
-    // GENDER
-    // =====================================
 
     const allowedGenders = [
       "Male",
@@ -542,28 +324,15 @@ const getProperties = async (req, res) => {
       "Any",
     ];
 
-
     if (gender) {
-
-      if (
-        !allowedGenders.includes(
-          gender
-        )
-      ) {
+      if (!allowedGenders.includes(gender)) {
         return res.status(400).json({
-          message:
-            "Invalid gender filter.",
+          message: "Invalid gender filter.",
         });
       }
 
-
       filter.gender = gender;
     }
-
-
-    // =====================================
-    // ROOM TYPE
-    // =====================================
 
     const allowedRoomTypes = [
       "Single",
@@ -572,85 +341,52 @@ const getProperties = async (req, res) => {
       "Shared",
     ];
 
-
     if (roomType) {
-
-      if (
-        !allowedRoomTypes.includes(
-          roomType
-        )
-      ) {
+      if (!allowedRoomTypes.includes(roomType)) {
         return res.status(400).json({
-          message:
-            "Invalid room type.",
+          message: "Invalid room type.",
         });
       }
 
-
-      filter.roomType =
-        roomType;
+      filter.roomType = roomType;
     }
-
-
-    // =====================================
-    // RENT FILTER
-    // =====================================
 
     if (
       minRent !== undefined ||
       maxRent !== undefined
     ) {
-
       filter.rent = {};
 
-
       if (minRent !== undefined) {
+        const value = Number(minRent);
 
-        const value =
-          Number(minRent);
-
-
-        if (
-          !Number.isFinite(value) ||
-          value < 0
-        ) {
+        if (!Number.isFinite(value) || value < 0) {
           return res.status(400).json({
             message:
               "minRent must be a valid non-negative number.",
           });
         }
 
-
         filter.rent.$gte = value;
       }
 
-
       if (maxRent !== undefined) {
+        const value = Number(maxRent);
 
-        const value =
-          Number(maxRent);
-
-
-        if (
-          !Number.isFinite(value) ||
-          value < 0
-        ) {
+        if (!Number.isFinite(value) || value < 0) {
           return res.status(400).json({
             message:
               "maxRent must be a valid non-negative number.",
           });
         }
 
-
         filter.rent.$lte = value;
       }
-
 
       if (
         filter.rent.$gte !== undefined &&
         filter.rent.$lte !== undefined &&
-        filter.rent.$gte >
-          filter.rent.$lte
+        filter.rent.$gte > filter.rent.$lte
       ) {
         return res.status(400).json({
           message:
@@ -659,68 +395,42 @@ const getProperties = async (req, res) => {
       }
     }
 
-
-    // =====================================
-    // DEPOSIT FILTER
-    // =====================================
-
     if (
       minDeposit !== undefined ||
       maxDeposit !== undefined
     ) {
-
       filter.deposit = {};
 
-
       if (minDeposit !== undefined) {
+        const value = Number(minDeposit);
 
-        const value =
-          Number(minDeposit);
-
-
-        if (
-          !Number.isFinite(value) ||
-          value < 0
-        ) {
+        if (!Number.isFinite(value) || value < 0) {
           return res.status(400).json({
             message:
               "minDeposit must be a valid non-negative number.",
           });
         }
 
-
-        filter.deposit.$gte =
-          value;
+        filter.deposit.$gte = value;
       }
 
-
       if (maxDeposit !== undefined) {
+        const value = Number(maxDeposit);
 
-        const value =
-          Number(maxDeposit);
-
-
-        if (
-          !Number.isFinite(value) ||
-          value < 0
-        ) {
+        if (!Number.isFinite(value) || value < 0) {
           return res.status(400).json({
             message:
               "maxDeposit must be a valid non-negative number.",
           });
         }
 
-
-        filter.deposit.$lte =
-          value;
+        filter.deposit.$lte = value;
       }
-
 
       if (
         filter.deposit.$gte !== undefined &&
         filter.deposit.$lte !== undefined &&
-        filter.deposit.$gte >
-          filter.deposit.$lte
+        filter.deposit.$gte > filter.deposit.$lte
       ) {
         return res.status(400).json({
           message:
@@ -729,228 +439,98 @@ const getProperties = async (req, res) => {
       }
     }
 
-
-    // =====================================
-    // AVAILABLE ROOMS
-    // =====================================
-
-    if (
-      availableOnly !== undefined
-    ) {
-
+    if (availableOnly !== undefined) {
       if (
         availableOnly !== "true" &&
         availableOnly !== "false"
       ) {
         return res.status(400).json({
-          message:
-            "availableOnly must be true or false.",
+          message: "availableOnly must be true or false.",
         });
       }
 
-
-      if (
-        availableOnly === "true"
-      ) {
+      if (availableOnly === "true") {
         filter.availableRooms = {
           $gt: 0,
         };
       }
     }
 
-
-    // =====================================
-    // SORTING
-    // =====================================
-
     let sortOption = {
       createdAt: -1,
     };
 
-
-    // Default:
-    // Newest first
-
-    if (
-      !sort ||
-      sort === "newest"
-    ) {
-
+    if (sort === "newest") {
       sortOption = {
         createdAt: -1,
       };
-
-    }
-
-
-    // Rent: Low → High
-
-    else if (
-      sort === "rent_asc"
-    ) {
-
+    } else if (sort === "rent_asc") {
       sortOption = {
         rent: 1,
         createdAt: -1,
       };
-
-    }
-
-
-    // Rent: High → Low
-
-    else if (
-      sort === "rent_desc"
-    ) {
-
+    } else if (sort === "rent_desc") {
       sortOption = {
         rent: -1,
         createdAt: -1,
       };
-
-    }
-
-
-    // Invalid sorting option
-
-    else {
-
+    } else {
       return res.status(400).json({
-        message:
-          "Invalid sort option.",
+        message: "Invalid sort option.",
       });
-
     }
-
-
-    // =====================================
-    // PAGINATION
-    // =====================================
 
     const skip =
-      (pageNumber - 1) *
-      limitNumber;
+      (pageNumber - 1) * limitNumber;
 
+    const [properties, total] =
+      await Promise.all([
+        Property.find(filter)
+          .populate("owner", "name email")
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limitNumber)
+          .lean(),
 
-    // =====================================
-    // DATABASE QUERY
-    // =====================================
-
-    const [
-      properties,
-      total,
-    ] = await Promise.all([
-
-      Property.find(filter)
-
-        .populate(
-          "owner",
-          "name email"
-        )
-
-        .sort(sortOption)
-
-        .skip(skip)
-
-        .limit(limitNumber),
-
-
-      Property.countDocuments(
-        filter
-      ),
-
-    ]);
-
-
-    // =====================================
-    // PAGINATION DATA
-    // =====================================
+        Property.countDocuments(filter),
+      ]);
 
     const totalPages =
-      Math.ceil(
-        total / limitNumber
-      );
-
-
-    // =====================================
-    // RESPONSE
-    // =====================================
+      total === 0
+        ? 1
+        : Math.ceil(total / limitNumber);
 
     return res.status(200).json({
       properties,
-
       pagination: {
-        currentPage:
-          pageNumber,
-
+        currentPage: pageNumber,
         totalPages,
-
-        totalProperties:
-          total,
-
-        limit:
-          limitNumber,
-
-        hasNextPage:
-          pageNumber <
-          totalPages,
-
-        hasPreviousPage:
-          pageNumber > 1,
+        totalProperties: total,
+        limit: limitNumber,
+        hasNextPage: pageNumber < totalPages,
+        hasPreviousPage: pageNumber > 1,
       },
     });
-
-
   } catch (error) {
-
-    console.error(
-      "Get properties error:",
-      error.message
-    );
-
+    console.error("Get properties error:", error);
 
     return res.status(500).json({
       message:
-        "Something went wrong.",
+        error.message ||
+        "Unable to load properties.",
     });
   }
 };
 
-
-// =====================================
-// GET SINGLE PROPERTY
-// =====================================
-
-const getPropertyById = async (
-  req,
-  res
-) => {
-
+const getPropertyById = async (req, res) => {
   try {
+    const { id } = req.params;
 
-    const { id } =
-      req.params;
-
-
-    // =====================================
-    // ID VALIDATION
-    // =====================================
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        id
-      )
-    ) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
-        message:
-          "Invalid property ID.",
+        message: "Invalid property ID.",
       });
     }
-
-
-    // =====================================
-    // FIND PROPERTY
-    // =====================================
 
     const property =
       await Property.findOne({
@@ -961,57 +541,33 @@ const getPropertyById = async (
         "name email"
       );
 
-
     if (!property) {
       return res.status(404).json({
-        message:
-          "Property not found.",
+        message: "Property not found.",
       });
     }
-
 
     return res.status(200).json({
       property,
     });
-
-
   } catch (error) {
-
-    console.error(
-      "Get property error:",
-      error.message
-    );
-
+    console.error("Get property error:", error);
 
     return res.status(500).json({
       message:
+        error.message ||
         "Something went wrong.",
     });
   }
 };
 
-
-// =====================================
-// GET MY PROPERTIES
-// =====================================
-
-const getMyProperties = async (
-  req,
-  res
-) => {
-
+const getMyProperties = async (req, res) => {
   try {
-
-    if (
-      !req.user ||
-      !req.user.userId
-    ) {
+    if (!req.user || !req.user.userId) {
       return res.status(401).json({
-        message:
-          "Authentication required.",
+        message: "Authentication required.",
       });
     }
-
 
     const properties =
       await Property.find({
@@ -1020,69 +576,44 @@ const getMyProperties = async (
         createdAt: -1,
       });
 
-
     return res.status(200).json({
       properties,
     });
-
-
   } catch (error) {
-
     console.error(
       "Get my properties error:",
-      error.message
+      error
     );
-
 
     return res.status(500).json({
       message:
+        error.message ||
         "Something went wrong.",
     });
   }
 };
 
-
-// =====================================
-// UPDATE PROPERTY
-// =====================================
-
-const updateProperty = async (
-  req,
-  res
-) => {
-
+const updateProperty = async (req, res) => {
   try {
+    const { id } = req.params;
 
-    const { id } =
-      req.params;
-
-
-    // =====================================
-    // ID VALIDATION
-    // =====================================
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        id
-      )
-    ) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
-        message:
-          "Invalid property ID.",
+        message: "Invalid property ID.",
       });
     }
 
-
-    // =====================================
-    // OWNERSHIP CHECK
-    // =====================================
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({
+        message: "Authentication required.",
+      });
+    }
 
     const property =
       await Property.findOne({
         _id: id,
         owner: req.user.userId,
       });
-
 
     if (!property) {
       return res.status(404).json({
@@ -1091,14 +622,7 @@ const updateProperty = async (
       });
     }
 
-
-    const body =
-      req.body || {};
-
-
-    // =====================================
-    // ALLOWED FIELDS
-    // =====================================
+    const body = req.body || {};
 
     const allowedFields = [
       "title",
@@ -1116,26 +640,74 @@ const updateProperty = async (
       "availableRooms",
       "amenities",
       "rules",
+      "location",
     ];
 
-
-    allowedFields.forEach(
-      (field) => {
-
-        if (
-          body[field] !== undefined
-        ) {
-          property[field] =
-            body[field];
-        }
-
+    allowedFields.forEach((field) => {
+      if (
+        body[field] !== undefined &&
+        field !== "location"
+      ) {
+        property[field] = body[field];
       }
-    );
+    });
 
+    if (body.location !== undefined) {
+      if (
+        !body.location ||
+        typeof body.location !== "object"
+      ) {
+        return res.status(400).json({
+          message: "Location must be a valid object.",
+        });
+      }
 
-    // =====================================
-    // STRING VALIDATION
-    // =====================================
+      const latitude =
+        Number(body.location.latitude);
+
+      const longitude =
+        Number(body.location.longitude);
+
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+      ) {
+        return res.status(400).json({
+          message:
+            "Latitude and longitude must be valid numbers.",
+        });
+      }
+
+      if (
+        latitude < -90 ||
+        latitude > 90
+      ) {
+        return res.status(400).json({
+          message:
+            "Latitude must be between -90 and 90.",
+        });
+      }
+
+      if (
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return res.status(400).json({
+          message:
+            "Longitude must be between -180 and 180.",
+        });
+      }
+
+      property.location = {
+        address:
+          typeof body.location.address === "string" &&
+          body.location.address.trim()
+            ? body.location.address.trim()
+            : property.address,
+        latitude,
+        longitude,
+      };
+    }
 
     const stringFields = [
       "title",
@@ -1146,16 +718,10 @@ const updateProperty = async (
       "pincode",
     ];
 
-
     for (const field of stringFields) {
-
-      if (
-        property[field] !== undefined
-      ) {
-
+      if (property[field] !== undefined) {
         if (
-          typeof property[field] !==
-          "string"
+          typeof property[field] !== "string"
         ) {
           return res.status(400).json({
             message:
@@ -1163,10 +729,8 @@ const updateProperty = async (
           });
         }
 
-
         property[field] =
           property[field].trim();
-
 
         if (!property[field]) {
           return res.status(400).json({
@@ -1177,27 +741,15 @@ const updateProperty = async (
       }
     }
 
-
-    // =====================================
-    // PINCODE VALIDATION
-    // =====================================
-
     if (
       property.pincode &&
-      !/^\d{6}$/.test(
-        property.pincode
-      )
+      !/^\d{6}$/.test(property.pincode)
     ) {
       return res.status(400).json({
         message:
           "Pincode must contain exactly 6 digits.",
       });
     }
-
-
-    // =====================================
-    // NUMBER VALIDATION
-    // =====================================
 
     const numericFields = [
       "rent",
@@ -1206,38 +758,22 @@ const updateProperty = async (
       "availableRooms",
     ];
 
-
     for (const field of numericFields) {
+      if (property[field] !== undefined) {
+        const value = Number(
+          property[field]
+        );
 
-      if (
-        property[field] !== undefined
-      ) {
-
-        const value =
-          Number(
-            property[field]
-          );
-
-
-        if (
-          !Number.isFinite(value)
-        ) {
+        if (!Number.isFinite(value)) {
           return res.status(400).json({
             message:
               `${field} must be a valid number.`,
           });
         }
 
-
-        property[field] =
-          value;
+        property[field] = value;
       }
     }
-
-
-    // =====================================
-    // RENT / DEPOSIT VALIDATION
-    // =====================================
 
     if (
       property.rent < 0 ||
@@ -1249,18 +785,9 @@ const updateProperty = async (
       });
     }
 
-
-    // =====================================
-    // ROOM VALIDATION
-    // =====================================
-
     if (
-      !Number.isInteger(
-        property.totalRooms
-      ) ||
-      !Number.isInteger(
-        property.availableRooms
-      )
+      !Number.isInteger(property.totalRooms) ||
+      !Number.isInteger(property.availableRooms)
     ) {
       return res.status(400).json({
         message:
@@ -1268,26 +795,19 @@ const updateProperty = async (
       });
     }
 
-
-    if (
-      property.totalRooms < 1
-    ) {
+    if (property.totalRooms < 1) {
       return res.status(400).json({
         message:
           "Total rooms must be at least 1.",
       });
     }
 
-
-    if (
-      property.availableRooms < 0
-    ) {
+    if (property.availableRooms < 0) {
       return res.status(400).json({
         message:
           "Available rooms cannot be negative.",
       });
     }
-
 
     if (
       property.availableRooms >
@@ -1299,197 +819,112 @@ const updateProperty = async (
       });
     }
 
-
-    // =====================================
-    // ARRAY VALIDATION
-    // =====================================
-
-    if (
-      !Array.isArray(
-        property.amenities
-      )
-    ) {
+    if (!Array.isArray(property.amenities)) {
       return res.status(400).json({
         message:
           "Amenities must be an array.",
       });
     }
 
-
-    if (
-      !Array.isArray(
-        property.rules
-      )
-    ) {
+    if (!Array.isArray(property.rules)) {
       return res.status(400).json({
         message:
           "Rules must be an array.",
       });
     }
 
-
-    // =====================================
-    // ARRAY CONTENT VALIDATION
-    // =====================================
-
-    const arraysToValidate = [
-      {
-        name: "amenities",
-        value: property.amenities,
-      },
-
-      {
-        name: "rules",
-        value: property.rules,
-      },
-    ];
-
-
-    for (
-      const item of arraysToValidate
-    ) {
-
-      for (
-        const value of item.value
+    for (const value of property.amenities) {
+      if (
+        typeof value !== "string" ||
+        !value.trim()
       ) {
-
-        if (
-          typeof value !== "string"
-        ) {
-          return res.status(400).json({
-            message:
-              `${item.name} must contain only strings.`,
-          });
-        }
-
-
-        if (!value.trim()) {
-          return res.status(400).json({
-            message:
-              `${item.name} cannot contain empty values.`,
-          });
-        }
+        return res.status(400).json({
+          message:
+            "Amenities must contain only non-empty strings.",
+        });
       }
     }
 
-
-    // =====================================
-    // SAVE
-    // =====================================
+    for (const value of property.rules) {
+      if (
+        typeof value !== "string" ||
+        !value.trim()
+      ) {
+        return res.status(400).json({
+          message:
+            "Rules must contain only non-empty strings.",
+        });
+      }
+    }
 
     await property.save();
-
 
     return res.status(200).json({
       message:
         "Property updated successfully.",
-
       property,
     });
-
-
   } catch (error) {
-
     console.error(
       "Update property error:",
-      error.message
+      error
     );
-
-
-    // =====================================
-    // MONGOOSE VALIDATION ERROR
-    // =====================================
 
     if (
       error.name ===
       "ValidationError"
     ) {
-
       const errors =
-        Object.values(
-          error.errors
-        ).map((item) => ({
-          field: item.path,
-          message: item.message,
-        }));
-
+        Object.values(error.errors).map(
+          (item) => ({
+            field: item.path,
+            message: item.message,
+          })
+        );
 
       return res.status(400).json({
         message:
           "Property validation failed.",
-
         errors,
       });
     }
 
-
-    // =====================================
-    // DUPLICATE KEY ERROR
-    // =====================================
-
-    if (
-      error.code === 11000
-    ) {
+    if (error.code === 11000) {
       return res.status(409).json({
         message:
           "A property with this information already exists.",
       });
     }
 
-
-    // =====================================
-    // SERVER ERROR
-    // =====================================
-
     return res.status(500).json({
       message:
+        error.message ||
         "Something went wrong.",
     });
   }
 };
 
-
-// =====================================
-// DELETE PROPERTY
-// =====================================
-
-const deleteProperty = async (
-  req,
-  res
-) => {
-
+const deleteProperty = async (req, res) => {
   try {
+    const { id } = req.params;
 
-    const { id } =
-      req.params;
-
-
-    // =====================================
-    // ID VALIDATION
-    // =====================================
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        id
-      )
-    ) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
-        message:
-          "Invalid property ID.",
+        message: "Invalid property ID.",
       });
     }
 
-
-    // =====================================
-    // OWNERSHIP CHECK
-    // =====================================
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({
+        message: "Authentication required.",
+      });
+    }
 
     const property =
       await Property.findOne({
         _id: id,
         owner: req.user.userId,
       });
-
 
     if (!property) {
       return res.status(404).json({
@@ -1498,37 +933,222 @@ const deleteProperty = async (
       });
     }
 
+    if (
+      Array.isArray(property.images) &&
+      property.images.length > 0
+    ) {
+      for (const image of property.images) {
+        if (image.publicId) {
+          try {
+            await cloudinary.uploader.destroy(
+              image.publicId,
+              {
+                resource_type: "image",
+              }
+            );
+          } catch (cloudinaryError) {
+            console.error(
+              "Cloudinary delete error:",
+              cloudinaryError
+            );
+          }
+        }
+      }
+    }
 
-    await Property.findByIdAndDelete(
-      id
-    );
-
+    await Property.findByIdAndDelete(id);
 
     return res.status(200).json({
       message:
         "Property deleted successfully.",
     });
-
-
   } catch (error) {
-
     console.error(
       "Delete property error:",
-      error.message
+      error
     );
-
 
     return res.status(500).json({
       message:
+        error.message ||
         "Something went wrong.",
     });
   }
 };
 
+const uploadPropertyImages = async (
+  req,
+  res
+) => {
+  const uploadedImages = [];
 
-// =====================================
-// EXPORTS
-// =====================================
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid property ID.",
+      });
+    }
+
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({
+        message: "Authentication required.",
+      });
+    }
+
+    if (
+      !req.files ||
+      req.files.length === 0
+    ) {
+      return res.status(400).json({
+        message:
+          "Please select at least one image.",
+      });
+    }
+
+    if (req.files.length > 6) {
+      return res.status(400).json({
+        message:
+          "You can upload a maximum of 6 images.",
+      });
+    }
+
+    const property =
+      await Property.findOne({
+        _id: id,
+        owner: req.user.userId,
+      });
+
+    if (!property) {
+      return res.status(404).json({
+        message:
+          "Property not found or you are not the owner.",
+      });
+    }
+
+    if (
+      property.images.length +
+      req.files.length >
+      6
+    ) {
+      return res.status(400).json({
+        message:
+          "A property can have a maximum of 6 images.",
+      });
+    }
+
+    const uploadToCloudinary = (
+      file
+    ) => {
+      return new Promise(
+        (resolve, reject) => {
+          const stream =
+            cloudinary.uploader.upload_stream(
+              {
+                folder:
+                  `staysync/properties/${id}`,
+                resource_type: "image",
+              },
+              (
+                error,
+                result
+              ) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+
+          stream.end(file.buffer);
+        }
+      );
+    };
+
+    for (const file of req.files) {
+      const result =
+        await uploadToCloudinary(file);
+
+      uploadedImages.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+      });
+    }
+
+    property.images.push(
+      ...uploadedImages
+    );
+
+    await property.save();
+
+    return res.status(200).json({
+      message:
+        "Property images uploaded successfully.",
+      images: property.images,
+      property,
+    });
+  } catch (error) {
+    console.error(
+      "Upload property images error:",
+      error
+    );
+
+    if (uploadedImages.length > 0) {
+      for (const image of uploadedImages) {
+        try {
+          await cloudinary.uploader.destroy(
+            image.publicId,
+            {
+              resource_type: "image",
+            }
+          );
+        } catch (cleanupError) {
+          console.error(
+            "Cloudinary cleanup error:",
+            cleanupError
+          );
+        }
+      }
+    }
+
+    if (
+      error.code ===
+      "LIMIT_FILE_SIZE"
+    ) {
+      return res.status(400).json({
+        message:
+          "Each image must be smaller than 5 MB.",
+      });
+    }
+
+    if (
+      error.code ===
+      "LIMIT_FILE_COUNT"
+    ) {
+      return res.status(400).json({
+        message:
+          "You can upload a maximum of 6 images.",
+      });
+    }
+
+    if (
+      error.message ===
+      "Only JPG, PNG and WebP images are allowed."
+    ) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      message:
+        error.message ||
+        "Failed to upload property images.",
+    });
+  }
+};
 
 module.exports = {
   createProperty,
@@ -1537,4 +1157,5 @@ module.exports = {
   getMyProperties,
   updateProperty,
   deleteProperty,
+  uploadPropertyImages,
 };

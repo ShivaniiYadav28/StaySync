@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLocation } from "react-router-dom";
 
 import { useAuth } from "../context/useAuth";
 
@@ -13,6 +14,9 @@ import "./Messages.css";
 
 
 function Messages() {
+
+  const location = useLocation();
+  const requestedConversationId = location.state?.conversationId;
 
   const {
     user,
@@ -170,34 +174,23 @@ function Messages() {
            * Automatically select the first
            * conversation.
            */
-          if (
-            conversationData.length > 0
-          ) {
-
-            setSelectedConversationId(
-              (previous) => {
-
-                const stillExists =
-                  previous &&
-                  conversationData.some(
-                    (conversation) =>
-                      String(
-                        conversation._id
-                      ) ===
-                      String(previous)
-                  );
-
-
-                if (stillExists) {
-                  return previous;
-                }
-
-
-                return conversationData[0]._id;
-
-              }
+          if (conversationData.length > 0) {
+            const requestedConversation = conversationData.find(
+              (conversation) =>
+                String(conversation._id) === String(requestedConversationId)
             );
 
+            if (requestedConversation) {
+              setSelectedConversationId(requestedConversation._id);
+              setMobileChatOpen(true);
+            } else {
+              setSelectedConversationId((previous) => {
+                const stillExists = previous && conversationData.some(
+                  (conversation) => String(conversation._id) === String(previous)
+                );
+                return stillExists ? previous : conversationData[0]._id;
+              });
+            }
           } else {
 
             setSelectedConversationId(
@@ -249,7 +242,7 @@ function Messages() {
 
     };
 
-  }, [isAuthenticated]);
+  }, [isAuthenticated, requestedConversationId]);
 
 
   /* =====================================================
@@ -783,6 +776,10 @@ function Messages() {
   const getPropertyName =
     (conversation) => {
 
+      if (conversation?.type === "roommate") {
+        return "Roommate conversation";
+      }
+
       return (
         conversation?.property?.title ||
         conversation?.property?.name ||
@@ -1312,14 +1309,14 @@ function Messages() {
               <div className="chat-property-bar">
 
                 <div className="chat-property-icon">
-                  🏠
+                  {selectedConversation.type === "roommate" ? "💬" : "🏠"}
                 </div>
 
 
                 <div>
 
                   <span>
-                    Property
+                    {selectedConversation.type === "roommate" ? "Conversation" : "Property"}
                   </span>
 
 

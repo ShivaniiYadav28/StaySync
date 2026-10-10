@@ -1,28 +1,24 @@
 const express = require("express");
 
-const protect = require(
-  "../middleware/authMiddleware"
-);
-
 const {
   createRoommateProfile,
-  getMyRoommateProfile,
-  updateRoommateProfile,
-  deleteRoommateProfile,
   getRoommateProfiles,
+  getMyRoommateProfile,
   getRoommateProfileById,
   getRoommateMatches,
-} = require(
-  "../controllers/roommateController"
+  updateMyRoommateProfile,
+  deleteMyRoommateProfile,
+} = require("../controllers/roommateController");
+
+const protect = require("../middleware/authMiddleware");
+
+const router = express.Router();
+
+router.get(
+  "/",
+  protect,
+  getRoommateProfiles
 );
-
-const router =
-  express.Router();
-
-
-// --------------------------------------------------
-// Protected routes
-// --------------------------------------------------
 
 router.post(
   "/",
@@ -36,43 +32,28 @@ router.get(
   getMyRoommateProfile
 );
 
-router.put(
-  "/me",
-  protect,
-  updateRoommateProfile
-);
-
-router.delete(
-  "/me",
-  protect,
-  deleteRoommateProfile
-);
-
-
-// --------------------------------------------------
-// Roommate Matching
-// --------------------------------------------------
-
 router.get(
   "/matches",
   protect,
   getRoommateMatches
 );
 
-
-// --------------------------------------------------
-// Public routes
-// --------------------------------------------------
-
-router.get(
-  "/",
-  getRoommateProfiles
-);
-
 router.get(
   "/:id",
+  protect,
   getRoommateProfileById
 );
 
+router.put(
+  "/me",
+  protect,
+  updateMyRoommateProfile
+);
+
+router.delete(
+  "/me",
+  protect,
+  deleteMyRoommateProfile
+);
 
 module.exports = router;

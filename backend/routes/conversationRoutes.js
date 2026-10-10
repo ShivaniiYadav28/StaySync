@@ -7,6 +7,7 @@ const protect =
 
 const {
   createConversation,
+  createRoommateConversation,
   getMyConversations,
   getMessages,
   sendMessage,
@@ -23,6 +24,12 @@ router.post(
   "/inquiry/:inquiryId",
   protect,
   createConversation
+);
+
+router.post(
+  "/roommate/:requestId",
+  protect,
+  createRoommateConversation
 );
 
 

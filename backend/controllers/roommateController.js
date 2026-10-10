@@ -1,441 +1,161 @@
-const mongoose = require("mongoose");
-
 const RoommateProfile = require("../models/RoommateProfile");
-const User = require("../models/User");
 
+const calculateCompatibility = (current, other) => {
+  let score = 0;
+  const reasons = [];
 
-// ==================================================
-// Helper: Get Authenticated User ID
-// ==================================================
+  if (
+    current.preferredCity.toLowerCase() ===
+    other.preferredCity.toLowerCase()
+  ) {
+    score += 15;
+    reasons.push("Same preferred city");
+  }
 
-const getUserId = (req) => {
-  return (
-    req.user?.id ||
-    req.user?._id ||
-    req.user?.userId
+  if (
+    current.preferredArea &&
+    other.preferredArea &&
+    current.preferredArea.toLowerCase() ===
+      other.preferredArea.toLowerCase()
+  ) {
+    score += 10;
+    reasons.push("Same preferred area");
+  }
+
+  const budgetDifference = Math.abs(
+    Number(current.budget) - Number(other.budget)
   );
-};
 
+  const averageBudget =
+    (Number(current.budget) + Number(other.budget)) / 2;
 
-// ==================================================
-// COMPATIBILITY FUNCTIONS
-// ==================================================
-
-// --------------------------------------------------
-// Budget Score
-// --------------------------------------------------
-
-const calculateBudgetScore = (
-  budget1,
-  budget2
-) => {
-  if (
-    !budget1 ||
-    !budget2 ||
-    budget1 <= 0 ||
-    budget2 <= 0
-  ) {
-    return 0;
+  if (budgetDifference <= averageBudget * 0.1) {
+    score += 15;
+    reasons.push("Similar budget");
+  } else if (budgetDifference <= averageBudget * 0.2) {
+    score += 10;
+    reasons.push("Compatible budget");
+  } else if (budgetDifference <= averageBudget * 0.35) {
+    score += 5;
   }
 
-  const difference =
+  if (
+    current.preferredRoomType === "any" ||
+    other.preferredRoomType === "any" ||
+    current.preferredRoomType ===
+      other.preferredRoomType
+  ) {
+    score += 10;
+    reasons.push("Compatible room preference");
+  }
+
+  if (
+    current.foodPreference === "any" ||
+    other.foodPreference === "any" ||
+    current.foodPreference ===
+      other.foodPreference
+  ) {
+    score += 8;
+    reasons.push("Similar food preference");
+  }
+
+  if (current.smoking === other.smoking) {
+    score += 7;
+    reasons.push("Similar smoking preference");
+  }
+
+  if (current.drinking === other.drinking) {
+    score += 5;
+    reasons.push("Similar drinking preference");
+  }
+
+  if (
+    current.pets === other.pets ||
+    current.pets === "comfortable" ||
+    other.pets === "comfortable"
+  ) {
+    score += 5;
+    reasons.push("Compatible pet preference");
+  }
+
+  if (
+    current.sleepSchedule ===
+    other.sleepSchedule
+  ) {
+    score += 8;
+    reasons.push("Similar sleep schedule");
+  }
+
+  const cleanlinessDifference = Math.abs(
+    Number(current.cleanliness) -
+      Number(other.cleanliness)
+  );
+
+  if (cleanlinessDifference === 0) {
+    score += 5;
+    reasons.push("Same cleanliness level");
+  } else if (cleanlinessDifference === 1) {
+    score += 3;
+    reasons.push("Similar cleanliness level");
+  }
+
+  const socialDifference = Math.abs(
+    Number(current.socialLevel) -
+      Number(other.socialLevel)
+  );
+
+  if (socialDifference === 0) {
+    score += 5;
+    reasons.push("Same social preference");
+  } else if (socialDifference === 1) {
+    score += 2;
+    reasons.push("Similar social preference");
+  }
+
+  const currentMoveIn = new Date(
+    current.moveInDate
+  );
+
+  const otherMoveIn = new Date(
+    other.moveInDate
+  );
+
+  const daysDifference =
     Math.abs(
-      budget1 - budget2
-    );
-
-  const average =
-    (budget1 + budget2) / 2;
-
-  const percentage =
-    difference / average;
-
-  if (percentage <= 0.10) {
-    return 100;
-  }
-
-  if (percentage <= 0.20) {
-    return 80;
-  }
-
-  if (percentage <= 0.30) {
-    return 60;
-  }
-
-  if (percentage <= 0.40) {
-    return 40;
-  }
-
-  return 20;
-};
-
-
-// --------------------------------------------------
-// Location Score
-// --------------------------------------------------
-
-const calculateLocationScore = (
-  profile1,
-  profile2
-) => {
-  const city1 =
-    profile1.preferredCity
-      ?.trim()
-      .toLowerCase();
-
-  const city2 =
-    profile2.preferredCity
-      ?.trim()
-      .toLowerCase();
-
-  const area1 =
-    profile1.preferredArea
-      ?.trim()
-      .toLowerCase();
-
-  const area2 =
-    profile2.preferredArea
-      ?.trim()
-      .toLowerCase();
-
-
-  // Same city + same area
-  if (
-    city1 === city2 &&
-    area1 &&
-    area2 &&
-    area1 === area2
-  ) {
-    return 100;
-  }
-
-
-  // Same city
-  if (
-    city1 === city2
-  ) {
-    return 80;
-  }
-
-
-  // Different city
-  return 0;
-};
-
-
-// --------------------------------------------------
-// Move-in Date Score
-// --------------------------------------------------
-
-const calculateMoveInScore = (
-  date1,
-  date2
-) => {
-  if (
-    !date1 ||
-    !date2
-  ) {
-    return 0;
-  }
-
-  const firstDate =
-    new Date(date1);
-
-  const secondDate =
-    new Date(date2);
-
-  const difference =
-    Math.abs(
-      firstDate.getTime() -
-        secondDate.getTime()
-    );
-
-  const days =
-    difference /
+      currentMoveIn.getTime() -
+        otherMoveIn.getTime()
+    ) /
     (1000 * 60 * 60 * 24);
 
-
-  if (days <= 7) {
-    return 100;
+  if (daysDifference <= 7) {
+    score += 7;
+    reasons.push("Similar move-in date");
+  } else if (daysDifference <= 30) {
+    score += 4;
   }
 
-  if (days <= 30) {
-    return 80;
-  }
-
-  if (days <= 60) {
-    return 60;
-  }
-
-  if (days <= 90) {
-    return 40;
-  }
-
-  return 20;
+  return {
+    score: Math.min(Math.round(score), 100),
+    reasons,
+  };
 };
-
-
-// --------------------------------------------------
-// Exact Preference Score
-// --------------------------------------------------
-
-const calculatePreferenceScore = (
-  value1,
-  value2
-) => {
-  if (
-    !value1 ||
-    !value2
-  ) {
-    return 0;
-  }
-
-  const first =
-    value1
-      .toString()
-      .trim()
-      .toLowerCase();
-
-  const second =
-    value2
-      .toString()
-      .trim()
-      .toLowerCase();
-
-
-  if (first === second) {
-    return 100;
-  }
-
-  return 0;
-};
-
-
-// --------------------------------------------------
-// Numeric Preference Score
-// --------------------------------------------------
-
-const calculateNumericPreferenceScore = (
-  value1,
-  value2
-) => {
-  if (
-    typeof value1 !== "number" ||
-    typeof value2 !== "number"
-  ) {
-    return 0;
-  }
-
-  const difference =
-    Math.abs(
-      value1 - value2
-    );
-
-
-  if (difference === 0) {
-    return 100;
-  }
-
-  if (difference === 1) {
-    return 80;
-  }
-
-  if (difference === 2) {
-    return 60;
-  }
-
-  if (difference === 3) {
-    return 40;
-  }
-
-  return 20;
-};
-
-
-// ==================================================
-// COMPLETE COMPATIBILITY CALCULATION
-// ==================================================
-
-const calculateCompatibility = (
-  userProfile,
-  otherProfile
-) => {
-
-  // 20%
-  const budgetScore =
-    calculateBudgetScore(
-      userProfile.budget,
-      otherProfile.budget
-    );
-
-
-  // 20%
-  const locationScore =
-    calculateLocationScore(
-      userProfile,
-      otherProfile
-    );
-
-
-  // 15%
-  const moveInScore =
-    calculateMoveInScore(
-      userProfile.moveInDate,
-      otherProfile.moveInDate
-    );
-
-
-  // 10%
-  const foodScore =
-    calculatePreferenceScore(
-      userProfile.foodPreference,
-      otherProfile.foodPreference
-    );
-
-
-  // 10%
-  const smokingScore =
-    calculatePreferenceScore(
-      userProfile.smoking,
-      otherProfile.smoking
-    );
-
-
-  // 10%
-  const sleepScore =
-    calculatePreferenceScore(
-      userProfile.sleepSchedule,
-      otherProfile.sleepSchedule
-    );
-
-
-  // 5%
-  const cleanlinessScore =
-    calculateNumericPreferenceScore(
-      userProfile.cleanliness,
-      otherProfile.cleanliness
-    );
-
-
-  // 5%
-  const drinkingScore =
-    calculatePreferenceScore(
-      userProfile.drinking,
-      otherProfile.drinking
-    );
-
-
-  // 3%
-  const petsScore =
-    calculatePreferenceScore(
-      userProfile.pets,
-      otherProfile.pets
-    );
-
-
-  // 2%
-  const socialScore =
-    calculateNumericPreferenceScore(
-      userProfile.socialLevel,
-      otherProfile.socialLevel
-    );
-
-
-  // ------------------------------------------------
-  // Weighted Final Score
-  // ------------------------------------------------
-
-  const finalScore =
-    budgetScore * 0.20 +
-    locationScore * 0.20 +
-    moveInScore * 0.15 +
-    foodScore * 0.10 +
-    smokingScore * 0.10 +
-    sleepScore * 0.10 +
-    cleanlinessScore * 0.05 +
-    drinkingScore * 0.05 +
-    petsScore * 0.03 +
-    socialScore * 0.02;
-
-
-  return Math.round(
-    finalScore
-  );
-};
-
-
-// ==================================================
-// CREATE ROOMMATE PROFILE
-// POST /api/roommates
-// ==================================================
 
 const createRoommateProfile = async (
   req,
   res
 ) => {
   try {
-
-    const userId =
-      getUserId(req);
-
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message:
-          "Authentication required.",
-      });
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        userId
-      )
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid user ID.",
-      });
-    }
-
-
     const existingProfile =
       await RoommateProfile.findOne({
-        user: userId,
+        user: req.user.userId,
       });
 
-
     if (existingProfile) {
-      return res.status(409).json({
-        success: false,
+      return res.status(400).json({
         message:
           "You already have a roommate profile.",
       });
     }
-
-
-    const user =
-      await User.findById(userId);
-
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message:
-          "User not found.",
-      });
-    }
-
-
-    if (!user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message:
-          "Your account is inactive.",
-      });
-    }
-
 
     const {
       age,
@@ -455,16 +175,38 @@ const createRoommateProfile = async (
       preferredRoomType,
     } = req.body;
 
+    if (
+      age === undefined ||
+      !gender ||
+      !occupation ||
+      budget === undefined ||
+      !preferredCity ||
+      !moveInDate ||
+      !foodPreference ||
+      !smoking ||
+      !drinking ||
+      !pets ||
+      !sleepSchedule ||
+      cleanliness === undefined ||
+      socialLevel === undefined ||
+      !preferredRoomType
+    ) {
+      return res.status(400).json({
+        message:
+          "Please provide all required roommate profile details.",
+      });
+    }
 
     const profile =
       await RoommateProfile.create({
-        user: userId,
+        user: req.user.userId,
         age,
         gender,
         occupation,
         budget,
         preferredCity,
-        preferredArea,
+        preferredArea:
+          preferredArea || "",
         moveInDate,
         foodPreference,
         smoking,
@@ -476,550 +218,333 @@ const createRoommateProfile = async (
         preferredRoomType,
       });
 
-
     const populatedProfile =
       await RoommateProfile.findById(
         profile._id
       ).populate(
         "user",
-        "name email role"
+        "name email"
       );
 
-
     return res.status(201).json({
-      success: true,
       message:
         "Roommate profile created successfully.",
-      profile:
-        populatedProfile,
+      profile: populatedProfile,
     });
-
   } catch (error) {
-
     console.error(
       "Create roommate profile error:",
       error
     );
 
-
-    if (
-      error.code === 11000
-    ) {
-      return res.status(409).json({
-        success: false,
+    if (error.code === 11000) {
+      return res.status(400).json({
         message:
           "You already have a roommate profile.",
       });
     }
 
-
-    if (
-      error instanceof
-      mongoose.Error.ValidationError
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Validation error.",
-        errors:
-          Object.values(
-            error.errors
-          ).map(
-            (item) =>
-              item.message
-          ),
-      });
-    }
-
-
     return res.status(500).json({
-      success: false,
       message:
         "Failed to create roommate profile.",
     });
   }
 };
 
-
-// ==================================================
-// GET MY PROFILE
-// GET /api/roommates/me
-// ==================================================
-
-const getMyRoommateProfile =
-  async (req, res) => {
-    try {
-
-      const userId =
-        getUserId(req);
-
-
-      if (!userId) {
-        return res.status(401).json({
-          success: false,
-          message:
-            "Authentication required.",
-        });
-      }
-
-
-      const profile =
-        await RoommateProfile.findOne({
-          user: userId,
-        }).populate(
+const getRoommateProfiles = async (
+  req,
+  res
+) => {
+  try {
+    const profiles =
+      await RoommateProfile.find({
+        isActive: true,
+      })
+        .populate(
           "user",
-          "name email role"
-        );
-
-
-      if (!profile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Roommate profile not found.",
-        });
-      }
-
-
-      return res.status(200).json({
-        success: true,
-        profile,
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Get roommate profile error:",
-        error
-      );
-
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch roommate profile.",
-      });
-    }
-  };
-
-
-// ==================================================
-// UPDATE MY PROFILE
-// PUT /api/roommates/me
-// ==================================================
-
-const updateRoommateProfile =
-  async (req, res) => {
-    try {
-
-      const userId =
-        getUserId(req);
-
-
-      if (!userId) {
-        return res.status(401).json({
-          success: false,
-          message:
-            "Authentication required.",
-        });
-      }
-
-
-      const allowedFields = [
-        "age",
-        "gender",
-        "occupation",
-        "budget",
-        "preferredCity",
-        "preferredArea",
-        "moveInDate",
-        "foodPreference",
-        "smoking",
-        "drinking",
-        "pets",
-        "sleepSchedule",
-        "cleanliness",
-        "socialLevel",
-        "preferredRoomType",
-      ];
-
-
-      const updates = {};
-
-
-      allowedFields.forEach(
-        (field) => {
-          if (
-            req.body[field] !==
-            undefined
-          ) {
-            updates[field] =
-              req.body[field];
-          }
-        }
-      );
-
-
-      if (
-        Object.keys(updates)
-          .length === 0
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "No valid fields provided for update.",
-        });
-      }
-
-
-      const profile =
-        await RoommateProfile.findOneAndUpdate(
-          {
-            user: userId,
-          },
-          {
-            $set: updates,
-          },
-          {
-            new: true,
-            runValidators: true,
-          }
-        ).populate(
-          "user",
-          "name email role"
-        );
-
-
-      if (!profile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Roommate profile not found.",
-        });
-      }
-
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Roommate profile updated successfully.",
-        profile,
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Update roommate profile error:",
-        error
-      );
-
-
-      if (
-        error instanceof
-        mongoose.Error.ValidationError
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Validation error.",
-          errors:
-            Object.values(
-              error.errors
-            ).map(
-              (item) =>
-                item.message
-            ),
-        });
-      }
-
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Failed to update roommate profile.",
-      });
-    }
-  };
-
-
-// ==================================================
-// DELETE MY PROFILE
-// DELETE /api/roommates/me
-// ==================================================
-
-const deleteRoommateProfile =
-  async (req, res) => {
-    try {
-
-      const userId =
-        getUserId(req);
-
-
-      if (!userId) {
-        return res.status(401).json({
-          success: false,
-          message:
-            "Authentication required.",
-        });
-      }
-
-
-      const profile =
-        await RoommateProfile.findOneAndDelete(
-          {
-            user: userId,
-          }
-        );
-
-
-      if (!profile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Roommate profile not found.",
-        });
-      }
-
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Roommate profile deleted successfully.",
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Delete roommate profile error:",
-        error
-      );
-
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Failed to delete roommate profile.",
-      });
-    }
-  };
-
-
-// ==================================================
-// GET ALL ROOMMATES
-// GET /api/roommates
-// ==================================================
-
-const getRoommateProfiles =
-  async (req, res) => {
-    try {
-
-      const profiles =
-        await RoommateProfile.find({
-          isActive: true,
-        })
-          .populate(
-            "user",
-            "name email role"
-          )
-          .sort({
-            createdAt: -1,
-          });
-
-
-      return res.status(200).json({
-        success: true,
-        count:
-          profiles.length,
-        profiles,
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Get roommate profiles error:",
-        error
-      );
-
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch roommate profiles.",
-      });
-    }
-  };
-
-
-// ==================================================
-// GET SINGLE ROOMMATE
-// GET /api/roommates/:id
-// ==================================================
-
-const getRoommateProfileById =
-  async (req, res) => {
-    try {
-
-      const { id } =
-        req.params;
-
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          id
+          "name email"
         )
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Invalid roommate profile ID.",
+        .sort({
+          createdAt: -1,
         });
-      }
 
+    return res.status(200).json({
+      profiles,
+    });
+  } catch (error) {
+    console.error(
+      "Get roommate profiles error:",
+      error
+    );
 
-      const profile =
-        await RoommateProfile.findOne({
-          _id: id,
-          isActive: true,
-        }).populate(
-          "user",
-          "name email role"
-        );
+    return res.status(500).json({
+      message:
+        "Failed to fetch roommate profiles.",
+    });
+  }
+};
 
-
-      if (!profile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Roommate profile not found.",
-        });
-      }
-
-
-      return res.status(200).json({
-        success: true,
-        profile,
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Get roommate profile by ID error:",
-        error
+const getMyRoommateProfile = async (
+  req,
+  res
+) => {
+  try {
+    const profile =
+      await RoommateProfile.findOne({
+        user: req.user.userId,
+      }).populate(
+        "user",
+        "name email"
       );
 
-
-      return res.status(500).json({
-        success: false,
+    if (!profile) {
+      return res.status(404).json({
         message:
-          "Failed to fetch roommate profile.",
+          "Roommate profile not found.",
       });
     }
-  };
 
+    return res.status(200).json({
+      profile,
+    });
+  } catch (error) {
+    console.error(
+      "Get my roommate profile error:",
+      error
+    );
 
-// ==================================================
-// FIND ROOMMATE MATCHES
-// GET /api/roommates/matches
-// ==================================================
+    return res.status(500).json({
+      message:
+        "Failed to fetch your roommate profile.",
+    });
+  }
+};
 
-const getRoommateMatches =
-  async (req, res) => {
-    try {
+const getRoommateProfileById = async (
+  req,
+  res
+) => {
+  try {
+    const profile =
+      await RoommateProfile.findOne({
+        _id: req.params.id,
+        isActive: true,
+      }).populate(
+        "user",
+        "name email"
+      );
 
-      const userId =
-        getUserId(req);
+    if (!profile) {
+      return res.status(404).json({
+        message:
+          "Roommate profile not found.",
+      });
+    }
 
+    return res.status(200).json({
+      profile,
+    });
+  } catch (error) {
+    console.error(
+      "Get roommate profile by ID error:",
+      error
+    );
 
-      if (!userId) {
-        return res.status(401).json({
-          success: false,
-          message:
-            "Authentication required.",
-        });
-      }
+    return res.status(500).json({
+      message:
+        "Failed to fetch roommate profile.",
+    });
+  }
+};
 
+const getRoommateMatches = async (
+  req,
+  res
+) => {
+  try {
+    const currentProfile =
+      await RoommateProfile.findOne({
+        user: req.user.userId,
+        isActive: true,
+      }).populate(
+        "user",
+        "name email"
+      );
 
-      const myProfile =
-        await RoommateProfile.findOne({
-          user: userId,
-          isActive: true,
-        });
+    if (!currentProfile) {
+      return res.status(404).json({
+        message:
+          "Please create and activate your roommate profile first.",
+      });
+    }
 
+    const profiles =
+      await RoommateProfile.find({
+        isActive: true,
+        user: {
+          $ne: req.user.userId,
+        },
+      }).populate(
+        "user",
+        "name email"
+      );
 
-      if (!myProfile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Create a roommate profile before finding matches.",
-        });
-      }
-
-
-      const otherProfiles =
-        await RoommateProfile.find({
-          isActive: true,
-          user: {
-            $ne: userId,
-          },
-        }).populate(
-          "user",
-          "name email role"
-        );
-
-
-      const matches =
-        otherProfiles
-          .map((profile) => {
-
-            const compatibilityScore =
-              calculateCompatibility(
-                myProfile,
-                profile
-              );
-
-
-            return {
-              profile,
-              compatibilityScore,
-            };
-          })
-          .sort(
-            (a, b) =>
-              b.compatibilityScore -
-              a.compatibilityScore
+    const matches = profiles.map(
+      (profile) => {
+        const compatibility =
+          calculateCompatibility(
+            currentProfile,
+            profile
           );
 
+        return {
+          profile,
+          compatibilityScore:
+            compatibility.score,
+          reasons:
+            compatibility.reasons,
+        };
+      }
+    );
 
-      return res.status(200).json({
-        success: true,
-        count:
-          matches.length,
-        matches,
+    matches.sort(
+      (a, b) =>
+        b.compatibilityScore -
+        a.compatibilityScore
+    );
+
+    return res.status(200).json({
+      currentProfile,
+      matches,
+    });
+  } catch (error) {
+    console.error(
+      "Get roommate matches error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Failed to calculate roommate matches.",
+    });
+  }
+};
+
+const updateMyRoommateProfile = async (
+  req,
+  res
+) => {
+  try {
+    const profile =
+      await RoommateProfile.findOne({
+        user: req.user.userId,
       });
 
-    } catch (error) {
-
-      console.error(
-        "Get roommate matches error:",
-        error
-      );
-
-
-      return res.status(500).json({
-        success: false,
+    if (!profile) {
+      return res.status(404).json({
         message:
-          "Failed to calculate roommate matches.",
+          "Roommate profile not found.",
       });
     }
-  };
 
+    const allowedFields = [
+      "age",
+      "gender",
+      "occupation",
+      "budget",
+      "preferredCity",
+      "preferredArea",
+      "moveInDate",
+      "foodPreference",
+      "smoking",
+      "drinking",
+      "pets",
+      "sleepSchedule",
+      "cleanliness",
+      "socialLevel",
+      "preferredRoomType",
+      "isActive",
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        profile[field] =
+          req.body[field];
+      }
+    });
+
+    await profile.save();
+
+    const updatedProfile =
+      await RoommateProfile.findById(
+        profile._id
+      ).populate(
+        "user",
+        "name email"
+      );
+
+    return res.status(200).json({
+      message:
+        "Roommate profile updated successfully.",
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    console.error(
+      "Update roommate profile error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Failed to update roommate profile.",
+    });
+  }
+};
+
+const deleteMyRoommateProfile = async (
+  req,
+  res
+) => {
+  try {
+    const profile =
+      await RoommateProfile.findOne({
+        user: req.user.userId,
+      });
+
+    if (!profile) {
+      return res.status(404).json({
+        message:
+          "Roommate profile not found.",
+      });
+    }
+
+    profile.isActive = false;
+
+    await profile.save();
+
+    return res.status(200).json({
+      message:
+        "Roommate profile deactivated successfully.",
+    });
+  } catch (error) {
+    console.error(
+      "Delete roommate profile error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Failed to deactivate roommate profile.",
+    });
+  }
+};
 
 module.exports = {
   createRoommateProfile,
-  getMyRoommateProfile,
-  updateRoommateProfile,
-  deleteRoommateProfile,
   getRoommateProfiles,
+  getMyRoommateProfile,
   getRoommateProfileById,
   getRoommateMatches,
+  updateMyRoommateProfile,
+  deleteMyRoommateProfile,
 };

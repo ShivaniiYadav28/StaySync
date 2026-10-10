@@ -1,19 +1,8 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
-
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import api from "../services/api";
-
 import "./Navbar.css";
-
 
 function Navbar() {
   const navigate = useNavigate();
@@ -24,91 +13,52 @@ function Navbar() {
     logout,
   } = useAuth();
 
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [
-    notifications,
-    setNotifications,
-  ] = useState([]);
+  const notificationRef = useRef(null);
 
-  const [
-    unreadCount,
-    setUnreadCount,
-  ] = useState(0);
+  const fetchNotifications = async () => {
+    if (!isAuthenticated) {
+      return;
+    }
 
-  const [
-    notificationOpen,
-    setNotificationOpen,
-  ] = useState(false);
+    try {
+      const response = await api.get("/notifications");
 
-  const [
-    mobileMenuOpen,
-    setMobileMenuOpen,
-  ] = useState(false);
+      setNotifications(
+        response.data.notifications || []
+      );
+    } catch (error) {
+      console.error(
+        "Fetch notifications error:",
+        error
+      );
+    }
+  };
 
-  const notificationRef =
-    useRef(null);
+  const fetchUnreadCount = async () => {
+    if (!isAuthenticated) {
+      return;
+    }
 
+    try {
+      const response = await api.get(
+        "/notifications/unread-count"
+      );
 
-  // ==================================================
-  // Load Notifications
-  // ==================================================
-
-  const fetchNotifications =
-    async () => {
-      if (!isAuthenticated) {
-        return;
-      }
-
-      try {
-        const response =
-          await api.get(
-            "/notifications"
-          );
-
-        setNotifications(
-          response.data.notifications ||
-            []
-        );
-      } catch (error) {
-        console.error(
-          "Fetch notifications error:",
-          error
-        );
-      }
-    };
-
-
-  // ==================================================
-  // Load Unread Count
-  // ==================================================
-
-  const fetchUnreadCount =
-    async () => {
-      if (!isAuthenticated) {
-        return;
-      }
-
-      try {
-        const response =
-          await api.get(
-            "/notifications/unread-count"
-          );
-
-        setUnreadCount(
-          response.data.unreadCount || 0
-        );
-      } catch (error) {
-        console.error(
-          "Fetch unread notification count error:",
-          error
-        );
-      }
-    };
-
-
-  // ==================================================
-  // Notification Loading
-  // ==================================================
+      setUnreadCount(
+        response.data.unreadCount || 0
+      );
+    } catch (error) {
+      console.error(
+        "Fetch unread notification count error:",
+        error
+      );
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -120,37 +70,26 @@ function Navbar() {
     fetchNotifications();
     fetchUnreadCount();
 
-    const interval =
-      setInterval(() => {
-        fetchUnreadCount();
-      }, 30000);
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+    }, 30000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [
-    isAuthenticated,
-  ]);
-
-
-  // ==================================================
-  // Close Notification Dropdown
-  // ==================================================
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    const handleClickOutside =
-      (event) => {
-        if (
-          notificationRef.current &&
-          !notificationRef.current.contains(
-            event.target
-          )
-        ) {
-          setNotificationOpen(
-            false
-          );
-        }
-      };
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(
+          event.target
+        )
+      ) {
+        setNotificationOpen(false);
+      }
+    };
 
     document.addEventListener(
       "mousedown",
@@ -165,294 +104,201 @@ function Navbar() {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error(
+        "Logout error:",
+        error
+      );
+    }
 
-  // ==================================================
-  // Logout
-  // ==================================================
+    setMobileMenuOpen(false);
+    setNotificationOpen(false);
 
-  const handleLogout =
-    async () => {
-      try {
-        await logout();
-      } catch (error) {
-        console.error(
-          "Logout error:",
-          error
-        );
-      }
+    navigate("/login");
+  };
 
-      setMobileMenuOpen(false);
-      setNotificationOpen(false);
-
-      navigate("/login");
-    };
-
-
-  // ==================================================
-  // Mark Notification Read
-  // ==================================================
-
-  const markNotificationAsRead =
-    async (notification) => {
-      try {
-        if (!notification.isRead) {
-          await api.patch(
-            `/notifications/${notification._id}/read`
-          );
-        }
-
-        setNotifications(
-          (previous) =>
-            previous.map(
-              (item) =>
-                item._id ===
-                notification._id
-                  ? {
-                      ...item,
-                      isRead: true,
-                    }
-                  : item
-            )
-        );
-
-        if (!notification.isRead) {
-          setUnreadCount(
-            (previous) =>
-              Math.max(
-                0,
-                previous - 1
-              )
-          );
-        }
-
-      } catch (error) {
-        console.error(
-          "Mark notification read error:",
-          error
-        );
-      }
-    };
-
-
-  // ==================================================
-  // Mark All Notifications Read
-  // ==================================================
-
-  const markAllAsRead =
-    async () => {
-      try {
+  const markNotificationAsRead = async (
+    notification
+  ) => {
+    try {
+      if (!notification.isRead) {
         await api.patch(
-          "/notifications/read-all"
+          `/notifications/${notification._id}/read`
         );
+      }
 
-        setNotifications(
-          (previous) =>
-            previous.map(
-              (notification) => ({
-                ...notification,
+      setNotifications((previous) =>
+        previous.map((item) =>
+          item._id === notification._id
+            ? {
+                ...item,
                 isRead: true,
-              })
-            )
-        );
-
-        setUnreadCount(0);
-
-      } catch (error) {
-        console.error(
-          "Mark all notifications read error:",
-          error
-        );
-      }
-    };
-
-
-  // ==================================================
-  // Notification Navigation
-  // ==================================================
-
-  const handleNotificationClick =
-    async (notification) => {
-      await markNotificationAsRead(
-        notification
+              }
+            : item
+        )
       );
 
-      setNotificationOpen(
-        false
+      if (!notification.isRead) {
+        setUnreadCount((previous) =>
+          Math.max(0, previous - 1)
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Mark notification read error:",
+        error
+      );
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      await api.patch(
+        "/notifications/read-all"
       );
 
-      setMobileMenuOpen(
-        false
+      setNotifications((previous) =>
+        previous.map((notification) => ({
+          ...notification,
+          isRead: true,
+        }))
       );
 
-
-      // New message
-      if (
-        notification.type ===
-        "new_message"
-      ) {
-        navigate("/messages");
-        return;
-      }
-
-
-      // Property notification
-      if (
-        notification.property?._id
-      ) {
-        navigate(
-          `/properties/${notification.property._id}`
-        );
-
-        return;
-      }
-
-      if (
-        notification.property
-      ) {
-        navigate(
-          `/properties/${notification.property}`
-        );
-
-        return;
-      }
-
-
-      // Inquiry notification
-      if (
-        notification.inquiry
-      ) {
-        navigate(
-          "/my-inquiries"
-        );
-      }
-    };
-
-
-  // ==================================================
-  // Notification Time
-  // ==================================================
-
-  const formatNotificationTime =
-    (date) => {
-      if (!date) {
-        return "";
-      }
-
-      const notificationDate =
-        new Date(date);
-
-      const now =
-        new Date();
-
-      const difference =
-        now.getTime() -
-        notificationDate.getTime();
-
-      const minutes =
-        Math.floor(
-          difference /
-            (1000 * 60)
-        );
-
-      if (minutes < 1) {
-        return "Just now";
-      }
-
-      if (minutes < 60) {
-        return `${minutes}m ago`;
-      }
-
-      const hours =
-        Math.floor(
-          minutes / 60
-        );
-
-      if (hours < 24) {
-        return `${hours}h ago`;
-      }
-
-      const days =
-        Math.floor(
-          hours / 24
-        );
-
-      if (days < 7) {
-        return `${days}d ago`;
-      }
-
-      return notificationDate.toLocaleDateString(
-        "en-IN",
-        {
-          day: "numeric",
-          month: "short",
-        }
+      setUnreadCount(0);
+    } catch (error) {
+      console.error(
+        "Mark all notifications read error:",
+        error
       );
-    };
+    }
+  };
 
+  const handleNotificationClick = async (
+    notification
+  ) => {
+    await markNotificationAsRead(
+      notification
+    );
 
-  // ==================================================
-  // Close Mobile Menu
-  // ==================================================
+    setNotificationOpen(false);
+    setMobileMenuOpen(false);
 
-  const closeMobileMenu =
-    () => {
-      setMobileMenuOpen(
-        false
+    if (
+      notification.type ===
+      "new_message"
+    ) {
+      navigate("/messages");
+      return;
+    }
+
+    if (notification.property?._id) {
+      navigate(
+        `/properties/${notification.property._id}`
       );
-    };
+      return;
+    }
 
+    if (notification.property) {
+      navigate(
+        `/properties/${notification.property}`
+      );
+      return;
+    }
 
-  // ==================================================
-  // Notification Icon
-  // ==================================================
+    if (notification.inquiry) {
+      navigate("/my-inquiries");
+    }
+  };
 
-  const getNotificationIcon =
-    (type) => {
-      switch (type) {
-        case "new_inquiry":
-          return "📩";
+  const formatNotificationTime = (
+    date
+  ) => {
+    if (!date) {
+      return "";
+    }
 
-        case "inquiry_accepted":
-          return "✅";
+    const notificationDate =
+      new Date(date);
 
-        case "inquiry_rejected":
-          return "❌";
+    const now = new Date();
 
-        case "new_review":
-          return "⭐";
+    const difference =
+      now.getTime() -
+      notificationDate.getTime();
 
-        case "new_message":
-          return "💬";
+    const minutes = Math.floor(
+      difference / (1000 * 60)
+    );
 
-        default:
-          return "🔔";
+    if (minutes < 1) {
+      return "Just now";
+    }
+
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    }
+
+    const hours = Math.floor(
+      minutes / 60
+    );
+
+    if (hours < 24) {
+      return `${hours}h ago`;
+    }
+
+    const days = Math.floor(
+      hours / 24
+    );
+
+    if (days < 7) {
+      return `${days}d ago`;
+    }
+
+    return notificationDate.toLocaleDateString(
+      "en-IN",
+      {
+        day: "numeric",
+        month: "short",
       }
-    };
+    );
+  };
 
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
+  const getNotificationIcon = (
+    type
+  ) => {
+    switch (type) {
+      case "new_inquiry":
+        return "📩";
+      case "inquiry_accepted":
+        return "✅";
+      case "inquiry_rejected":
+        return "❌";
+      case "new_review":
+        return "⭐";
+      case "new_message":
+        return "💬";
+      default:
+        return "🔔";
+    }
+  };
 
   return (
     <header className="navbar">
-
       <div className="navbar-container">
-
-        {/* ==========================================
-            LOGO
-            ========================================== */}
-
         <Link
           to="/"
           className="navbar-logo"
-          onClick={
-            closeMobileMenu
-          }
+          onClick={closeMobileMenu}
         >
           StaySync
         </Link>
-
-
-        {/* ==========================================
-            DESKTOP NAVIGATION
-            ========================================== */}
 
         <nav
           className={`navbar-links ${
@@ -461,114 +307,88 @@ function Navbar() {
               : ""
           }`}
         >
-
-          {/* ----------------------------------------
-              COMMON LINKS
-              ---------------------------------------- */}
-
           <Link
             to="/"
-            onClick={
-              closeMobileMenu
-            }
+            onClick={closeMobileMenu}
           >
             Home
           </Link>
 
           <Link
             to="/properties"
-            onClick={
-              closeMobileMenu
-            }
+            onClick={closeMobileMenu}
           >
             Find a Stay
           </Link>
 
-
-          {/* ========================================
-              AUTHENTICATED NAVIGATION
-              ======================================== */}
-
           {isAuthenticated && (
             <>
-
-              {/* ------------------------------------
-                  SEEKER LINKS
-                  ------------------------------------ */}
-
-              {user?.role ===
-                "seeker" && (
+              {user?.role === "seeker" && (
                 <>
                   <Link
                     to="/favorites"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Favorites
                   </Link>
 
                   <Link
                     to="/my-inquiries"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     My Inquiries
                   </Link>
 
                   <Link
                     to="/roommates"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Find Roommates
                   </Link>
 
                   <Link
+                    to="/roommate-requests"
+                    onClick={closeMobileMenu}
+                  >
+                    Roommate Requests
+                  </Link>
+
+                  <Link
                     to="/messages"
                     className="navbar-message-link"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Messages
                   </Link>
                 </>
               )}
 
-
-              {/* ------------------------------------
-                  OWNER LINKS
-                  ------------------------------------ */}
-
-              {user?.role ===
-                "owner" && (
+              {user?.role === "owner" && (
                 <>
                   <Link
+                    to="/owner/dashboard"
+                    onClick={closeMobileMenu}
+                  >
+                    Owner Dashboard
+                  </Link>
+
+                  <Link
                     to="/owner/add-property"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Add Property
                   </Link>
 
                   <Link
                     to="/owner/my-properties"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     My Properties
                   </Link>
 
                   <Link
                     to="/owner/inquiries"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Inquiries
                   </Link>
@@ -576,89 +396,59 @@ function Navbar() {
                   <Link
                     to="/messages"
                     className="navbar-message-link"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Messages
                   </Link>
                 </>
               )}
 
-
-              {/* ------------------------------------
-                  ADMIN LINKS
-                  ------------------------------------ */}
-
-              {user?.role ===
-                "admin" && (
+              {user?.role === "admin" && (
                 <>
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={closeMobileMenu}
+                  >
+                    Admin Dashboard
+                  </Link>
+
                   <Link
                     to="/messages"
                     className="navbar-message-link"
-                    onClick={
-                      closeMobileMenu
-                    }
+                    onClick={closeMobileMenu}
                   >
                     Messages
                   </Link>
                 </>
               )}
-
             </>
           )}
 
-
-          {/* ========================================
-              MOBILE AUTH ACTIONS
-              ======================================== */}
-
           {!isAuthenticated && (
             <div className="navbar-mobile-auth">
-
               <Link
                 to="/login"
-                onClick={
-                  closeMobileMenu
-                }
+                onClick={closeMobileMenu}
               >
                 Login
               </Link>
 
               <Link
                 to="/register"
-                onClick={
-                  closeMobileMenu
-                }
+                onClick={closeMobileMenu}
               >
                 Register
               </Link>
-
             </div>
           )}
-
         </nav>
 
-
-        {/* ==========================================
-            RIGHT SIDE
-            ========================================== */}
-
         <div className="navbar-actions">
-
-
-          {/* ========================================
-              NOTIFICATIONS
-              ======================================== */}
-
           {isAuthenticated && (
             <div
               className="navbar-notification-wrapper"
-              ref={
-                notificationRef
-              }
+              ref={notificationRef}
             >
-
               <button
                 type="button"
                 className="navbar-notification-button"
@@ -670,33 +460,22 @@ function Navbar() {
                 }
                 aria-label="Notifications"
               >
-
                 <span className="notification-bell">
                   🔔
                 </span>
 
-                {unreadCount >
-                  0 && (
+                {unreadCount > 0 && (
                   <span className="notification-count">
-                    {unreadCount >
-                    99
+                    {unreadCount > 99
                       ? "99+"
                       : unreadCount}
                   </span>
                 )}
-
               </button>
-
-
-              {/* ------------------------------------
-                  NOTIFICATION DROPDOWN
-                  ------------------------------------ */}
 
               {notificationOpen && (
                 <div className="notification-dropdown">
-
                   <div className="notification-header">
-
                     <div>
                       <h3>
                         Notifications
@@ -709,8 +488,7 @@ function Navbar() {
                       </span>
                     </div>
 
-                    {unreadCount >
-                      0 && (
+                    {unreadCount > 0 && (
                       <button
                         type="button"
                         className="mark-all-button"
@@ -721,16 +499,12 @@ function Navbar() {
                         Mark all read
                       </button>
                     )}
-
                   </div>
 
-
                   <div className="notification-list">
-
                     {notifications.length ===
-                      0 ? (
+                    0 ? (
                       <div className="notification-empty">
-
                         <div>
                           🔔
                         </div>
@@ -738,13 +512,10 @@ function Navbar() {
                         <p>
                           No notifications yet.
                         </p>
-
                       </div>
                     ) : (
                       notifications.map(
-                        (
-                          notification
-                        ) => (
+                        (notification) => (
                           <button
                             type="button"
                             key={
@@ -761,7 +532,6 @@ function Navbar() {
                               )
                             }
                           >
-
                             <div className="notification-icon">
                               {getNotificationIcon(
                                 notification.type
@@ -769,7 +539,6 @@ function Navbar() {
                             </div>
 
                             <div className="notification-content">
-
                               <strong>
                                 {
                                   notification.title
@@ -787,54 +556,38 @@ function Navbar() {
                                   notification.createdAt
                                 )}
                               </span>
-
                             </div>
 
                             {!notification.isRead && (
                               <span className="notification-unread-dot" />
                             )}
-
                           </button>
                         )
                       )
                     )}
-
                   </div>
-
                 </div>
               )}
-
             </div>
           )}
 
-
-          {/* ========================================
-              USER / AUTH AREA
-              ======================================== */}
-
           {isAuthenticated ? (
             <div className="navbar-user-area">
-
               <span className="navbar-user-greeting">
                 Hi,{" "}
-                {user?.name ||
-                  "User"}
+                {user?.name || "User"}
               </span>
 
               <button
                 type="button"
                 className="navbar-logout-button"
-                onClick={
-                  handleLogout
-                }
+                onClick={handleLogout}
               >
                 Logout
               </button>
-
             </div>
           ) : (
             <div className="navbar-desktop-auth">
-
               <Link
                 to="/login"
                 className="navbar-login-link"
@@ -848,22 +601,15 @@ function Navbar() {
               >
                 Register
               </Link>
-
             </div>
           )}
-
-
-          {/* ========================================
-              MOBILE MENU BUTTON
-              ======================================== */}
 
           <button
             type="button"
             className="navbar-menu-button"
             onClick={() =>
               setMobileMenuOpen(
-                (previous) =>
-                  !previous
+                (previous) => !previous
               )
             }
             aria-label="Toggle navigation menu"
@@ -872,14 +618,10 @@ function Navbar() {
               ? "✕"
               : "☰"}
           </button>
-
         </div>
-
       </div>
-
     </header>
   );
 }
-
 
 export default Navbar;

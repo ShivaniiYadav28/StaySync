@@ -1299,3 +1299,131 @@
     padding: 0 12px;
   }
 }
+.messages-container {
+  border: 1px solid #30415c;
+  border-radius: 22px;
+  background: #0f172a;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.42);
+}
+
+.messages-sidebar {
+  background: #0d1626;
+}
+
+.messages-sidebar-header {
+  background: linear-gradient(135deg, #111827, #17263b);
+}
+
+.messages-sidebar-header h1 {
+  font-size: 28px;
+}
+
+.conversation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+.messages-sidebar .conversation-item {
+  min-height: 86px;
+  padding: 14px;
+  border: 1px solid #263650;
+  border-radius: 14px;
+  background: #121e32;
+}
+
+.messages-sidebar .conversation-item:hover {
+  border-color: #168f88;
+  background: #17283d;
+}
+
+.messages-sidebar .conversation-active {
+  border: 1px solid rgba(45, 212, 191, 0.65);
+  border-left: 4px solid #2dd4bf;
+  padding-left: 11px;
+  background: linear-gradient(115deg, rgba(20, 184, 166, 0.22), rgba(124, 58, 237, 0.12));
+}
+
+.messages-chat {
+  background: #0b1423;
+}
+
+.chat-header {
+  height: 84px;
+  background: linear-gradient(110deg, #111827, #17263b);
+}
+
+.chat-property-bar {
+  margin: 12px 18px 0;
+  border: 1px solid #293a54;
+  border-radius: 14px;
+}
+
+.chat-messages {
+  background: radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.09), transparent 45%), #0d1728;
+}
+
+.message-bubble {
+  max-width: min(72%, 560px);
+  padding: 12px 16px 9px;
+  border-radius: 17px;
+}
+
+.message-mine {
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+}
+
+.message-input-area {
+  padding: 15px 18px 9px;
+}
+
+.message-input-area textarea {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.send-message-button {
+  min-width: 82px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+}
+
+@media (max-width: 700px) {
+  .messages-sidebar .conversation-item {
+    min-height: 82px;
+  }
+
+  .message-bubble {
+    max-width: 82%;
+  }
+}
+.messages-page {
+  height: calc(100vh - 74px);
+  min-height: 0;
+  padding: 18px 24px;
+  overflow: hidden;
+}
+
+.messages-container {
+  height: 100%;
+  min-height: 0;
+}
+
+.messages-chat,
+.chat-messages {
+  min-height: 0;
+}
+
+@media (max-width: 700px) {
+  .messages-page {
+    height: calc(100vh - 64px);
+    min-height: 550px;
+    padding: 0;
+  }
+
+  .messages-container {
+    height: 100%;
+    min-height: 550px;
+  }
+}

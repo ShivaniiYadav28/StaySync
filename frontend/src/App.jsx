@@ -18,29 +18,28 @@ import PropertyDetails from "./pages/PropertyDetails";
 import AddProperty from "./pages/AddProperty";
 import MyProperties from "./pages/MyProperties";
 import OwnerInquiries from "./pages/OwnerInquiries";
+import OwnerDashboard from "./pages/OwnerDashboard";
 
 import Favorites from "./pages/Favorites";
 import MyInquiries from "./pages/MyInquiries";
 
 import Messages from "./pages/Messages";
+import Booking from "./pages/Booking";
 
 import Roommates from "./pages/Roommates";
+import CreateRoommateProfile from "./pages/CreateRoommateProfile";
+import RoommateRequests from "./pages/RoommateRequests";
+
+import EditProperty from "./pages/EditProperty";
 
 import "./App.css";
-
 
 function App() {
   return (
     <BrowserRouter>
-
       <Navbar />
 
       <Routes>
-
-        {/* ==========================================
-            PUBLIC ROUTES
-            ========================================== */}
-
         <Route
           path="/"
           element={<HomePage />}
@@ -66,16 +65,11 @@ function App() {
           element={<PropertyDetails />}
         />
 
-
-        {/* ==========================================
-            PROTECTED ROUTES
-            ========================================== */}
-
         <Route element={<ProtectedRoute />}>
-
-          {/* ----------------------------------------
-              OWNER ROUTES
-              ---------------------------------------- */}
+          <Route
+            path="/owner/dashboard"
+            element={<OwnerDashboard />}
+          />
 
           <Route
             path="/owner/add-property"
@@ -92,11 +86,6 @@ function App() {
             element={<OwnerInquiries />}
           />
 
-
-          {/* ----------------------------------------
-              SEEKER ROUTES
-              ---------------------------------------- */}
-
           <Route
             path="/favorites"
             element={<Favorites />}
@@ -107,40 +96,38 @@ function App() {
             element={<MyInquiries />}
           />
 
-
-          {/* ----------------------------------------
-              MESSAGING
-              ---------------------------------------- */}
-
           <Route
             path="/messages"
             element={<Messages />}
           />
-
-
-          {/* ----------------------------------------
-              ROOMMATE MATCHING
-              ---------------------------------------- */}
+          <Route
+            path="/properties/:id/book"
+            element={<Booking />}
+          />
 
           <Route
             path="/roommates"
             element={<Roommates />}
           />
 
-          {/* 
-            The individual roommate profile page
-            will be added later.
+          <Route
+            path="/roommates/create"
+            element={<CreateRoommateProfile />}
+          />
 
-            Example future route:
-            /roommates/:id
-          */}
+          <Route
+            path="/roommate-requests"
+            element={<RoommateRequests />}
+          />
 
+          <Route
+            path="/owner/properties/:id/edit"
+            element={<EditProperty />}
+          />
         </Route>
-
       </Routes>
 
       <Footer />
-
     </BrowserRouter>
   );
 }

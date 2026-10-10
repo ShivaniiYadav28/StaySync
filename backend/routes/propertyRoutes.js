@@ -1,101 +1,53 @@
 const express = require("express");
-const upload = require("../middleware/uploadMiddleware");
-
-const {
-  uploadPropertyImages,
-  deletePropertyImage,
-} = require("../controllers/imageController");
-const router = express.Router();
-
-const protect = require("../middleware/authMiddleware");
-const allowRoles = require("../middleware/roleMiddleware");
 
 const {
   createProperty,
   getProperties,
   getPropertyById,
+  getMyProperties,
   updateProperty,
   deleteProperty,
-  getMyProperties,
+  uploadPropertyImages,
 } = require("../controllers/propertyController");
 
-// =====================================
-// PUBLIC ROUTES
-// =====================================
+const protect = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
+
+const router = express.Router();
+
+router.get("/", getProperties);
 
 router.get(
-  "/",
-  getProperties
-);
-
-// =====================================
-// PROTECTED OWNER ROUTES
-// =====================================
-
-// IMPORTANT:
-// This route must come before /:id
-
-router.get(
-  "/owner/my-properties",
+  "/my-properties",
   protect,
-  allowRoles("owner"),
   getMyProperties
 );
 
-// =====================================
-// CREATE PROPERTY
-// =====================================
+router.get("/:id", getPropertyById);
 
 router.post(
   "/",
   protect,
-  allowRoles("owner"),
   createProperty
 );
 
-// =====================================
-// SINGLE PROPERTY
-// =====================================
-
-router.get(
-  "/:id",
-  getPropertyById
-);
-
-// =====================================
-// UPDATE PROPERTY
-// =====================================
-
-router.put(
-  "/:id",
-  protect,
-  allowRoles("owner"),
-  updateProperty
-);
-
-// =====================================
-// DELETE PROPERTY
-// =====================================
-
-router.delete(
-  "/:id",
-  protect,
-  allowRoles("owner"),
-  deleteProperty
-);
 router.post(
   "/:id/images",
   protect,
-  allowRoles("owner"),
   upload.array("images", 6),
   uploadPropertyImages
 );
 
-router.delete(
-  "/:id/images/:imageId",
+router.put(
+  "/:id",
   protect,
-  allowRoles("owner"),
-  deletePropertyImage
+  updateProperty
+);
+
+router.delete(
+  "/:id",
+  protect,
+  deleteProperty
 );
 
 module.exports = router;

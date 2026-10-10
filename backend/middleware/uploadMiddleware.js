@@ -9,26 +9,25 @@ const fileFilter = (req, file, cb) => {
     "image/webp",
   ];
 
-  if (!allowedTypes.includes(file.mimetype)) {
-    return cb(
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
       new Error(
-        "Only JPEG, PNG, and WebP images are allowed."
-      )
+        "Only JPG, PNG and WebP images are allowed."
+      ),
+      false
     );
   }
-
-  cb(null, true);
 };
 
 const upload = multer({
   storage,
-
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024,
     files: 6,
   },
-
-  fileFilter,
 });
 
 module.exports = upload;
