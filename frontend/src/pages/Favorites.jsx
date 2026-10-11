@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
 
-import "./Favorites.css";
-
 function Favorites() {
   const { user } = useAuth();
 
@@ -109,9 +107,9 @@ function Favorites() {
 
   if (user?.role !== "seeker") {
     return (
-      <div className="favorites-page">
-        <div className="favorites-container">
-          <div className="favorites-message">
+      <div className="favorites-page [min-height:80vh] [background:#0b1120] [padding:45px_20px_70px] max-[600px]:[padding:30px_15px_50px]">
+        <div className="favorites-container [max-width:1200px] [margin:0_auto]">
+          <div className="favorites-message [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [border:1px_solid_#273449] [border-radius:14px] [padding:55px_25px] [text-align:center] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.25)]">
             <h2>
               Favorites are available
               for seekers.
@@ -119,7 +117,7 @@ function Favorites() {
 
             <Link
               to="/properties"
-              className="favorites-primary-button"
+              className="favorites-primary-button [display:inline-block] [padding:11px_20px] [border-radius:8px] [background:#0d9488] [color:#ffffff] [text-decoration:none] [font-size:14px] [font-weight:600] [transition:background_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] hover:[background:#14b8a6] hover:[transform:translateY(-1px)] hover:[box-shadow:0_7px_18px_rgba(20,_184,_166,_0.2)]"
             >
               Browse Properties
             </Link>
@@ -137,10 +135,10 @@ function Favorites() {
 
   if (loading) {
     return (
-      <div className="favorites-page">
-        <div className="favorites-container">
+      <div className="favorites-page [min-height:80vh] [background:#0b1120] [padding:45px_20px_70px] max-[600px]:[padding:30px_15px_50px]">
+        <div className="favorites-container [max-width:1200px] [margin:0_auto]">
 
-          <div className="favorites-message">
+          <div className="favorites-message [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [border:1px_solid_#273449] [border-radius:14px] [padding:55px_25px] [text-align:center] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.25)]">
             Loading your favorites...
           </div>
 
@@ -157,10 +155,10 @@ function Favorites() {
 
   if (error) {
     return (
-      <div className="favorites-page">
-        <div className="favorites-container">
+      <div className="favorites-page [min-height:80vh] [background:#0b1120] [padding:45px_20px_70px] max-[600px]:[padding:30px_15px_50px]">
+        <div className="favorites-container [max-width:1200px] [margin:0_auto]">
 
-          <div className="favorites-message favorites-error">
+          <div className="favorites-message favorites-error [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [border:1px_solid_#273449] [border-radius:14px] [padding:55px_25px] [text-align:center] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.25)] [color:#fca5a5] [background:#2a1518] [border-color:#7f1d1d]">
             {error}
           </div>
 
@@ -177,14 +175,14 @@ function Favorites() {
 
   if (favorites.length === 0) {
     return (
-      <div className="favorites-page">
+      <div className="favorites-page [min-height:80vh] [background:#0b1120] [padding:45px_20px_70px] max-[600px]:[padding:30px_15px_50px]">
 
-        <div className="favorites-container">
+        <div className="favorites-container [max-width:1200px] [margin:0_auto]">
 
-          <div className="favorites-header">
+          <div className="favorites-header [display:flex] [align-items:flex-end] [justify-content:space-between] [gap:20px] [margin-bottom:30px] [&_h1]:[margin:0_0_8px] [&_h1]:[color:#f8fafc] [&_h1]:[font-size:36px] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:15px] max-[600px]:[flex-direction:column] max-[600px]:[align-items:flex-start] max-[600px]:[&_h1]:[font-size:29px]">
 
             <div>
-              <p className="favorites-label">
+              <p className="favorites-label [margin:0_0_7px] [color:#2dd4bf] [font-size:13px] [font-weight:700] [letter-spacing:1.5px]">
                 STAYSYNC
               </p>
 
@@ -200,9 +198,9 @@ function Favorites() {
 
           </div>
 
-          <div className="favorites-empty">
+          <div className="favorites-empty [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [border:1px_solid_#273449] [border-radius:14px] [padding:55px_25px] [text-align:center] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.25)] [&_h2]:[margin:0_0_8px] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:24px] [&_p]:[margin:0_0_22px] [&_p]:[color:#94a3b8] [&_p]:[font-size:15px]">
 
-            <div className="favorites-empty-icon">
+            <div className="favorites-empty-icon [margin-bottom:15px] [color:#2dd4bf] [font-size:60px] [line-height:1]">
               ♡
             </div>
 
@@ -217,7 +215,7 @@ function Favorites() {
 
             <Link
               to="/properties"
-              className="favorites-primary-button"
+              className="favorites-primary-button [display:inline-block] [padding:11px_20px] [border-radius:8px] [background:#0d9488] [color:#ffffff] [text-decoration:none] [font-size:14px] [font-weight:600] [transition:background_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] hover:[background:#14b8a6] hover:[transform:translateY(-1px)] hover:[box-shadow:0_7px_18px_rgba(20,_184,_166,_0.2)]"
             >
               Find a Stay
             </Link>
@@ -237,17 +235,17 @@ function Favorites() {
   */
 
   return (
-    <div className="favorites-page">
+    <div className="favorites-page [min-height:80vh] [background:#0b1120] [padding:45px_20px_70px] max-[600px]:[padding:30px_15px_50px]">
 
-      <div className="favorites-container">
+      <div className="favorites-container [max-width:1200px] [margin:0_auto]">
 
         {/* HEADER */}
 
-        <div className="favorites-header">
+        <div className="favorites-header [display:flex] [align-items:flex-end] [justify-content:space-between] [gap:20px] [margin-bottom:30px] [&_h1]:[margin:0_0_8px] [&_h1]:[color:#f8fafc] [&_h1]:[font-size:36px] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:15px] max-[600px]:[flex-direction:column] max-[600px]:[align-items:flex-start] max-[600px]:[&_h1]:[font-size:29px]">
 
           <div>
 
-            <p className="favorites-label">
+            <p className="favorites-label [margin:0_0_7px] [color:#2dd4bf] [font-size:13px] [font-weight:700] [letter-spacing:1.5px]">
               STAYSYNC
             </p>
 
@@ -262,7 +260,7 @@ function Favorites() {
 
           </div>
 
-          <div className="favorites-count">
+          <div className="favorites-count [padding:9px_15px] [border-radius:20px] [background:rgba(20,_184,_166,_0.12)] [border:1px_solid_rgba(45,_212,_191,_0.15)] [color:#5eead4] [font-size:14px] [font-weight:600] [white-space:nowrap]">
             {favorites.length}{" "}
             {favorites.length === 1
               ? "property"
@@ -273,7 +271,7 @@ function Favorites() {
 
         {/* GRID */}
 
-        <div className="favorites-grid">
+        <div className="favorites-grid [display:grid] [grid-template-columns:repeat(3,_1fr)] [gap:22px] max-[900px]:[grid-template-columns:repeat(2,_1fr)] max-[600px]:[grid-template-columns:1fr]">
 
           {favorites.map(
             (favorite) => {
@@ -296,13 +294,13 @@ function Favorites() {
 
               return (
                 <article
-                  className="favorite-card"
+                  className="favorite-card [overflow:hidden] [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [border:1px_solid_#273449] [border-radius:14px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.25)] [transition:transform_0.2s_ease,_box-shadow_0.2s_ease,_border-color_0.2s_ease] hover:[transform:translateY(-5px)] hover:[border-color:#0d9488] hover:[box-shadow:0_15px_35px_rgba(0,_0,_0,_0.4)] [&:hover_.favorite-card-image_>_img]:[transform:scale(1.04)]"
                   key={favorite._id}
                 >
 
                   {/* IMAGE */}
 
-                  <div className="favorite-card-image">
+                  <div className="favorite-card-image [position:relative] [height:220px] [overflow:hidden] [background:linear-gradient(_135deg,_#172033,_#0f292b_)] [&>_img]:[width:100%] [&>_img]:[height:100%] [&>_img]:[display:block] [&>_img]:[object-fit:cover] [&>_img]:[transition:transform_0.35s_ease] max-[600px]:[height:210px]">
 
                     {imageUrl ? (
                       <img
@@ -312,7 +310,7 @@ function Favorites() {
                         }
                       />
                     ) : (
-                      <div className="favorite-image-fallback">
+                      <div className="favorite-image-fallback [width:100%] [height:100%] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:7px] [color:#94a3b8] [&_span]:[font-size:48px] [&_p]:[margin:0] [&_p]:[font-size:14px] [&_p]:[font-weight:600]">
 
                         <span>
                           🏠
@@ -325,13 +323,13 @@ function Favorites() {
                       </div>
                     )}
 
-                    <span className="favorite-property-type">
+                    <span className="favorite-property-type [position:absolute] [top:14px] [left:14px] [padding:7px_12px] [border-radius:20px] [background:rgba(15,_23,_42,_0.9)] [border:1px_solid_rgba(255,_255,_255,_0.12)] [color:#5eead4] [font-size:12px] [font-weight:700] [box-shadow:0_4px_12px_rgba(0,_0,_0,_0.35)]">
                       {property.propertyType}
                     </span>
 
                     <button
                       type="button"
-                      className="favorite-remove-button"
+                      className="favorite-remove-button [position:absolute] [top:12px] [right:12px] [width:42px] [height:42px] [display:flex] [align-items:center] [justify-content:center] [border:1px_solid_rgba(255,_255,_255,_0.15)] [border-radius:50%] [background:rgba(15,_23,_42,_0.9)] [color:#fb7185] [font-size:21px] [cursor:pointer] [box-shadow:0_5px_15px_rgba(0,_0,_0,_0.35)] [transition:transform_0.2s_ease,_background_0.2s_ease,_box-shadow_0.2s_ease] hover:[transform:scale(1.08)] hover:[background:#1e293b] hover:[box-shadow:0_7px_18px_rgba(0,_0,_0,_0.45)] disabled:[opacity:0.6] disabled:[cursor:not-allowed]"
                       onClick={() =>
                         handleRemoveFavorite(
                           property._id
@@ -351,15 +349,15 @@ function Favorites() {
 
                   {/* CONTENT */}
 
-                  <div className="favorite-card-content">
+                  <div className="favorite-card-content [padding:20px]">
 
-                    <div className="favorite-card-top">
+                    <div className="favorite-card-top [display:flex] [justify-content:space-between] [align-items:flex-start] [gap:15px] [margin-bottom:9px] [&_h2]:[margin:0] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:19px] [&_h2]:[line-height:1.3] max-[600px]:[flex-direction:column] max-[600px]:[gap:7px]">
 
                       <h2>
                         {property.title}
                       </h2>
 
-                      <div className="favorite-price">
+                      <div className="favorite-price [color:#2dd4bf] [font-size:19px] [font-weight:700] [white-space:nowrap] [&_span]:[margin-left:3px] [&_span]:[color:#64748b] [&_span]:[font-size:12px] [&_span]:[font-weight:400]">
                         ₹{property.rent}
                         <span>
                           /month
@@ -368,12 +366,12 @@ function Favorites() {
 
                     </div>
 
-                    <p className="favorite-location">
+                    <p className="favorite-location [margin:0_0_16px] [color:#94a3b8] [font-size:14px]">
                       📍 {property.area},{" "}
                       {property.city}
                     </p>
 
-                    <div className="favorite-tags">
+                    <div className="favorite-tags [display:flex] [flex-wrap:wrap] [gap:7px] [margin-bottom:18px] [&_span]:[padding:6px_9px] [&_span]:[border-radius:6px] [&_span]:[background:#1e293b] [&_span]:[border:1px_solid_#334155] [&_span]:[color:#cbd5e1] [&_span]:[font-size:12px] [&_span]:[font-weight:600]">
 
                       <span>
                         {property.roomType}
@@ -394,7 +392,7 @@ function Favorites() {
 
                     <Link
                       to={`/properties/${property._id}`}
-                      className="favorite-view-button"
+                      className="favorite-view-button [display:block] [width:100%] [box-sizing:border-box] [padding:11px] [text-align:center] [text-decoration:none] [border-radius:8px] [background:#0d9488] [color:#ffffff] [font-size:14px] [font-weight:600] [transition:background_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] hover:[background:#14b8a6] hover:[transform:translateY(-1px)] hover:[box-shadow:0_7px_18px_rgba(20,_184,_166,_0.2)]"
                     >
                       View Property
                     </Link>

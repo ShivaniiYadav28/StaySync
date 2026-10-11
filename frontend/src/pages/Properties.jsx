@@ -10,9 +10,6 @@ import {
 
 import api from "../services/api";
 
-import "./Properties.css";
-
-
 function Properties() {
 
   /* =====================================================
@@ -893,7 +890,7 @@ function Properties() {
 
     return (
 
-      <div className="properties-page">
+      <div className="properties-page [min-height:80vh] [background:#0b1120] [color:#f8fafc] [padding:40px_20px_70px] max-[650px]:[padding:28px_14px_50px] max-[400px]:[padding-left:10px] max-[400px]:[padding-right:10px]">
 
         <div className="properties-loading">
 
@@ -914,20 +911,20 @@ function Properties() {
 
   return (
 
-    <div className="properties-page">
+    <div className="properties-page [min-height:80vh] [background:#0b1120] [color:#f8fafc] [padding:40px_20px_70px] max-[650px]:[padding:28px_14px_50px] max-[400px]:[padding-left:10px] max-[400px]:[padding-right:10px]">
 
-      <div className="properties-container">
+      <div className="properties-container [width:100%] [max-width:1200px] [margin:0_auto]">
 
 
         {/* =============================================
             HEADER
         ============================================= */}
 
-        <div className="properties-header">
+        <div className="properties-header [text-align:center] [margin-bottom:35px] [&_h1]:[margin:0_0_10px] [&_h1]:[color:#f8fafc] [&_h1]:[font-size:36px] [&_h1]:[font-weight:800] [&_h1]:[line-height:1.2] [&_span]:[display:block] [&_span]:[color:#94a3b8] [&_span]:[font-size:16px] [&_span]:[line-height:1.6] max-[650px]:[margin-bottom:25px] max-[650px]:[&_h1]:[font-size:28px] max-[650px]:[&_span]:[font-size:14px]">
 
           <div>
 
-            <p className="properties-label">
+            <p className="properties-label [margin:0_0_8px] [color:#14b8a6] [font-size:13px] [font-weight:700] [letter-spacing:0.14em] [text-transform:uppercase]">
 
               STAYSYNC PROPERTIES
 
@@ -960,7 +957,7 @@ function Properties() {
 
         {error && (
 
-          <div className="form-error">
+          <div className="form-error [padding:14px] [border-radius:8px] [margin-bottom:20px] [background:rgba(239,_68,_68,_0.1)] [border:1px_solid_rgba(248,_113,_113,_0.2)] [color:#f87171] [padding:14px_16px] [background:rgba(127,_29,_29,_0.25)] [border:1px_solid_#7f1d1d] [border-radius:10px] [color:#fca5a5] [font-size:14px]">
 
             {error}
 
@@ -974,14 +971,14 @@ function Properties() {
         ============================================= */}
 
         <form
-          className="property-filters"
+          className="property-filters [width:100%] [box-sizing:border-box] [display:grid] [grid-template-columns:repeat(4,_minmax(0,_1fr))] [gap:18px] [margin-bottom:35px] [padding:25px] [background:#111827] [border:1px_solid_#273449] [border-radius:16px] [box-shadow:0_12px_35px_rgba(0,_0,_0,_0.25)] max-[1000px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] max-[650px]:[grid-template-columns:1fr] max-[650px]:[padding:18px] max-[650px]:[gap:15px] max-[400px]:[padding:15px]"
           onSubmit={handleSearch}
         >
 
 
           {/* Search */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="search">
 
@@ -1004,7 +1001,7 @@ function Properties() {
 
           {/* City */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="city">
 
@@ -1027,7 +1024,7 @@ function Properties() {
 
           {/* Property Type */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="propertyType">
 
@@ -1084,7 +1081,7 @@ function Properties() {
 
           {/* Gender */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="gender">
 
@@ -1134,7 +1131,7 @@ function Properties() {
 
           {/* Room Type */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="roomType">
 
@@ -1191,7 +1188,7 @@ function Properties() {
 
           {/* Minimum Rent */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="minRent">
 
@@ -1215,7 +1212,7 @@ function Properties() {
 
           {/* Maximum Rent */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="maxRent">
 
@@ -1239,7 +1236,7 @@ function Properties() {
 
           {/* Sort */}
 
-          <div className="filter-group">
+          <div className="filter-group [display:flex] [flex-direction:column] [gap:8px] [min-width:0] [&_label]:[color:#f8fafc] [&_label]:[font-size:14px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[min-width:0] [&_input]:[box-sizing:border-box] [&_input]:[padding:12px_13px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-size:14px] [&_input]:[outline:none] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_select]:[width:100%] [&_select]:[min-width:0] [&_select]:[box-sizing:border-box] [&_select]:[padding:12px_13px] [&_select]:[border:1px_solid_#334155] [&_select]:[border-radius:9px] [&_select]:[background:#0f172a] [&_select]:[color:#f8fafc] [&_select]:[font-size:14px] [&_select]:[outline:none] [&_select]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_input:hover]:[border-color:#475569] [&_select:hover]:[border-color:#475569] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_input:focus]:[background:#111827] [&_select:focus]:[border-color:#14b8a6] [&_select:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.14)] [&_select:focus]:[background:#111827] [&_select]:[cursor:pointer] [&_select_option]:[background:#111827] [&_select_option]:[color:#f8fafc]">
 
             <label htmlFor="sort">
 
@@ -1282,7 +1279,7 @@ function Properties() {
 
           {/* Available */}
 
-          <div className="filter-checkbox">
+          <div className="filter-checkbox [display:flex] [align-items:center] [min-height:68px] [&_label]:[display:flex] [&_label]:[align-items:center] [&_label]:[gap:10px] [&_label]:[color:#cbd5e1] [&_label]:[font-size:14px] [&_label]:[font-weight:500] [&_label]:[cursor:pointer] [&_input]:[width:17px] [&_input]:[height:17px] [&_input]:[accent-color:#14b8a6] [&_input]:[cursor:pointer] max-[650px]:[min-height:auto]">
 
             <label>
 
@@ -1307,11 +1304,11 @@ function Properties() {
 
           {/* Buttons */}
 
-          <div className="filter-actions">
+          <div className="filter-actions [display:flex] [align-items:flex-end] [gap:10px] [min-height:68px] max-[650px]:[min-height:auto] max-[650px]:[flex-direction:column]">
 
             <button
               type="submit"
-              className="filter-search-btn"
+              className="filter-search-btn [border:none] [border-radius:9px] [padding:12px_20px] [font-size:14px] [font-weight:700] [cursor:pointer] [transition:background_0.2s_ease,_transform_0.15s_ease,_border-color_0.2s_ease] [background:#14b8a6] [color:#06131a] hover:[background:#2dd4bf] hover:[transform:translateY(-1px)] active:[transform:translateY(0)] max-[650px]:[width:100%]"
             >
 
               Search
@@ -1321,7 +1318,7 @@ function Properties() {
 
             <button
               type="button"
-              className="filter-clear-btn"
+              className="filter-clear-btn [border:none] [border-radius:9px] [padding:12px_20px] [font-size:14px] [font-weight:700] [cursor:pointer] [transition:background_0.2s_ease,_transform_0.15s_ease,_border-color_0.2s_ease] [background:#1e293b] [color:#cbd5e1] [border:1px_solid_#334155] hover:[background:#273449] hover:[color:#f8fafc] hover:[transform:translateY(-1px)] active:[transform:translateY(0)] max-[650px]:[width:100%]"
               onClick={handleClear}
             >
 
@@ -1339,7 +1336,7 @@ function Properties() {
             RESULTS HEADER
         ============================================= */}
 
-        <div className="properties-results-header">
+        <div className="properties-results-header [display:flex] [justify-content:space-between] [align-items:center] [gap:15px] [margin-bottom:20px] [&_h2]:[margin:0] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:21px] [&_h2]:[font-weight:700] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px] max-[650px]:[flex-direction:column] max-[650px]:[align-items:flex-start] max-[650px]:[gap:5px]">
 
           <h2>
 
@@ -1382,9 +1379,9 @@ function Properties() {
 
         {properties.length === 0 ? (
 
-          <div className="empty-properties">
+          <div className="empty-properties [padding:60px_25px] [text-align:center] [background:#111827] [border:1px_solid_#273449] [border-radius:16px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.2)] [&_h2]:[margin:0_0_10px] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:22px] [&_p]:[margin:0_0_20px] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px] [&_button]:[padding:11px_18px] [&_button]:[border:none] [&_button]:[border-radius:9px] [&_button]:[background:#14b8a6] [&_button]:[color:#06131a] [&_button]:[font-size:14px] [&_button]:[font-weight:700] [&_button]:[cursor:pointer] [&_button:hover]:[background:#2dd4bf] [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [padding:70px_20px] [border-radius:14px] [box-shadow:0_10px_30px_rgba(0,_0,_0,_0.22)] [&_p]:[margin-bottom:25px]">
 
-            <div className="empty-icon">
+            <div className="empty-icon [margin-bottom:15px] [font-size:48px]">
 
               🏠
 
@@ -1427,7 +1424,7 @@ function Properties() {
                 PROPERTY GRID
             ========================================= */}
 
-            <div className="property-grid">
+            <div className="property-grid [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:22px] [width:100%] max-[1000px]:[grid-template-columns:repeat(2,_minmax(0,_1fr))] max-[650px]:[grid-template-columns:1fr] max-[650px]:[gap:18px]">
 
               {properties.map(
                 (property) => {
@@ -1446,14 +1443,14 @@ function Properties() {
                   return (
 
                     <div
-                      className="property-card"
+                      className="property-card [position:relative] [min-width:0] [display:flex] [flex-direction:column] [overflow:hidden] [background:#111827] [border:1px_solid_#273449] [border-radius:16px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.22)] [transition:transform_0.2s_ease,_border-color_0.2s_ease,_box-shadow_0.2s_ease] hover:[transform:translateY(-5px)] hover:[border-color:#14b8a6] hover:[box-shadow:0_14px_35px_rgba(0,_0,_0,_0.35)] [&:hover_.property-image]:[transform:scale(1.04)]"
                       key={propertyId}
                     >
 
 
                       {/* Image */}
 
-                      <div className="property-image-wrapper">
+                      <div className="property-image-wrapper [position:relative] [width:100%] [height:220px] [overflow:hidden] [background:#1e293b] max-[650px]:[height:210px] max-[400px]:[height:190px]">
 
                         {image ? (
 
@@ -1463,12 +1460,12 @@ function Properties() {
                               property.title ||
                               "Property"
                             }
-                            className="property-image"
+                            className="property-image [display:block] [width:100%] [height:100%] [object-fit:cover] [transition:transform_0.35s_ease]"
                           />
 
                         ) : (
 
-                          <div className="property-image-placeholder">
+                          <div className="property-image-placeholder [width:100%] [height:100%] [display:flex] [align-items:center] [justify-content:center] [background:linear-gradient(_135deg,_#111827,_#1e293b_)] [color:#64748b] [font-size:48px]">
 
                             🏠
 
@@ -1481,7 +1478,7 @@ function Properties() {
 
                         {property.propertyType && (
 
-                          <span className="property-type-badge">
+                          <span className="property-type-badge [position:absolute] [top:14px] [right:14px] [padding:7px_12px] [background:rgba(11,_17,_32,_0.88)] [border:1px_solid_#334155] [border-radius:999px] [color:#2dd4bf] [font-size:12px] [font-weight:700] [backdrop-filter:blur(8px)] max-[400px]:[top:12px] max-[400px]:[right:12px] max-[400px]:[padding:6px_9px] [z-index:2] [top:20px] [right:20px] [padding:9px_16px] [border:1px_solid_rgba(94,_234,_212,_0.28)] [background:rgba(15,_23,_42,_0.88)] [backdrop-filter:blur(10px)] [color:#5eead4] [font-size:13px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.3)] max-[768px]:[top:14px] max-[768px]:[right:14px] max-[480px]:[top:10px] max-[480px]:[right:10px] max-[480px]:[padding:7px_11px] max-[480px]:[font-size:12px]">
 
                             {
                               property.propertyType
@@ -1496,7 +1493,7 @@ function Properties() {
 
                         <button
                           type="button"
-                          className={`favorite-button ${
+                          className={`favorite-button [position:absolute] [top:14px] [left:14px] [width:40px] [height:40px] [display:flex] [align-items:center] [justify-content:center] [border:1px_solid_#334155] [border-radius:50%] [background:rgba(11,_17,_32,_0.88)] [color:#cbd5e1] [font-size:21px] [cursor:pointer] [backdrop-filter:blur(8px)] [transition:background_0.2s_ease,_color_0.2s_ease,_border-color_0.2s_ease,_transform_0.2s_ease] hover:[transform:scale(1.06)] hover:[border-color:#14b8a6] hover:[color:#2dd4bf] hover:[background:rgba(15,_23,_42,_0.95)] [&.active]:[border-color:rgba(20,_184,_166,_0.55)] [&.active]:[background:rgba(20,_184,_166,_0.16)] [&.active]:[color:#2dd4bf] max-[400px]:[width:36px] max-[400px]:[height:36px] max-[400px]:[font-size:18px] ${
                             isFavorite(
                               propertyId
                             )
@@ -1530,10 +1527,10 @@ function Properties() {
 
                       {/* Card Content */}
 
-                      <div className="property-card-content">
+                      <div className="property-card-content [display:flex] [flex-direction:column] [flex:1] [padding:18px] max-[650px]:[padding:16px]">
 
 
-                        <div className="property-card-top">
+                        <div className="property-card-top [display:flex] [justify-content:space-between] [align-items:flex-start] [gap:12px] [margin-bottom:10px] [&_h2]:[min-width:0] [&_h2]:[margin:0] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:19px] [&_h2]:[font-weight:700] [&_h2]:[line-height:1.35] [&_h2]:[overflow-wrap:anywhere] max-[650px]:[&_h2]:[font-size:18px]">
 
                           <h2>
 
@@ -1547,7 +1544,7 @@ function Properties() {
 
                           {property.gender && (
 
-                            <span className="property-gender">
+                            <span className="property-gender [flex-shrink:0] [padding:6px_10px] [background:#1e293b] [border:1px_solid_#334155] [border-radius:999px] [color:#cbd5e1] [font-size:12px] [font-weight:700]">
 
                               {
                                 property.gender
@@ -1562,7 +1559,7 @@ function Properties() {
 
                         {/* Location */}
 
-                        <p className="property-location">
+                        <p className="property-location [margin:4px_0_10px] [color:#94a3b8] [font-size:14px] [line-height:1.5]">
 
                           📍{" "}
 
@@ -1578,7 +1575,7 @@ function Properties() {
 
                         {/* Rent */}
 
-                        <p className="property-rent">
+                        <p className="property-rent [margin:4px_0_12px] [color:#2dd4bf] [font-size:22px] [font-weight:800] [&_span]:[margin-left:4px] [&_span]:[color:#64748b] [&_span]:[font-size:12px] [&_span]:[font-weight:500] max-[650px]:[font-size:20px]">
 
                           ₹
 
@@ -1602,7 +1599,7 @@ function Properties() {
 
                         {/* Details */}
 
-                        <div className="property-meta">
+                        <div className="property-meta [display:flex] [flex-wrap:wrap] [gap:7px] [margin-bottom:18px] [&_span]:[display:inline-flex] [&_span]:[align-items:center] [&_span]:[padding:6px_9px] [&_span]:[background:#0f172a] [&_span]:[border:1px_solid_#273449] [&_span]:[border-radius:7px] [&_span]:[color:#94a3b8] [&_span]:[font-size:12px] [&_span]:[font-weight:500]">
 
                           {property.roomType && (
 
@@ -1654,7 +1651,7 @@ function Properties() {
 
                         <Link
                           to={`/properties/${propertyId}`}
-                          className="view-property-btn"
+                          className="view-property-btn [display:block] [width:100%] [box-sizing:border-box] [margin-top:auto] [padding:11px_14px] [text-align:center] [text-decoration:none] [background:#14b8a6] [border-radius:9px] [color:#06131a] [font-size:14px] [font-weight:700] [transition:background_0.2s_ease,_transform_0.15s_ease] hover:[background:#2dd4bf] hover:[transform:translateY(-1px)]"
                         >
 
                           View Property
@@ -1679,7 +1676,7 @@ function Properties() {
 
             {totalPages > 1 && (
 
-              <div className="pagination">
+              <div className="pagination [display:flex] [justify-content:center] [align-items:center] [flex-wrap:wrap] [gap:8px] [margin-top:35px] [&_button]:[min-width:42px] [&_button]:[padding:10px_14px] [&_button]:[border:1px_solid_#334155] [&_button]:[border-radius:8px] [&_button]:[background:#111827] [&_button]:[color:#cbd5e1] [&_button]:[font-size:14px] [&_button]:[font-weight:600] [&_button]:[cursor:pointer] [&_button]:[transition:background_0.2s_ease,_border-color_0.2s_ease,_color_0.2s_ease] [&_button:hover:not(:disabled)]:[background:#1e293b] [&_button:hover:not(:disabled)]:[border-color:#14b8a6] [&_button:hover:not(:disabled)]:[color:#2dd4bf] [&_button.active]:[background:#14b8a6] [&_button.active]:[border-color:#14b8a6] [&_button.active]:[color:#06131a] [&_button:disabled]:[opacity:0.4] [&_button:disabled]:[cursor:not-allowed]">
 
 
                 <button

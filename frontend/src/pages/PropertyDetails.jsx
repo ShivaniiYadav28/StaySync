@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
-import "./PropertyDetails.css";
-
 function PropertyDetails() {
 const { id } = useParams();
 
@@ -627,7 +625,7 @@ Number(rating) || 0;
 
 return (
 <div
-className="review-stars"
+className="review-stars [display:inline-flex] [align-items:center] [gap:2px]"
 aria-label={`${numericRating} out of 5 stars`}
 >
 {[1, 2, 3, 4, 5].map(
@@ -650,7 +648,7 @@ star <= numericRating
 
 if (loading) {
 return (
-<div className="details-state">
+<div className="details-state [min-height:70vh] [display:flex] [align-items:center] [justify-content:center] [color:#94a3b8] [font-size:16px] [&.error]:[color:#f87171]">
 Loading property...
 </div>
 );
@@ -658,7 +656,7 @@ Loading property...
 
 if (error || !property) {
 return (
-<div className="details-state error">
+<div className="details-state error [min-height:70vh] [display:flex] [align-items:center] [justify-content:center] [color:#94a3b8] [font-size:16px] [&.error]:[color:#f87171]">
 {error ||
 "Property not found."}
 </div>
@@ -696,21 +694,21 @@ images.length - 1
 };
 
 return (
-<div className="property-details-page">
-<div className="details-container">
+<div className="property-details-page [min-height:100vh] [background:radial-gradient(_circle_at_top_left,_rgba(20,_184,_166,_0.06),_transparent_30%_),_#0b1120] [padding:42px_20px_80px] [color:#f8fafc] max-[768px]:[padding:30px_14px_60px] max-[480px]:[padding:22px_10px_50px]">
+<div className="details-container [width:100%] [max-width:1100px] [margin:0_auto]">
 
 <Link
 to="/properties"
-className="back-link"
+className="back-link [display:inline-flex] [align-items:center] [gap:8px] [margin-bottom:22px] [color:#5eead4] [text-decoration:none] [font-size:14px] [font-weight:600] [transition:color_0.2s_ease,_transform_0.2s_ease] hover:[color:#2dd4bf] hover:[transform:translateX(-3px)]"
 >
 ← Back to properties
 </Link>
 
-<div className="details-card">
+<div className="details-card [overflow:hidden] [background:linear-gradient(_145deg,_rgba(17,_24,_39,_0.98),_rgba(15,_23,_42,_0.98)_)] [border:1px_solid_#273449] [border-radius:20px] [box-shadow:0_24px_70px_rgba(0,_0,_0,_0.35),_0_0_0_1px_rgba(20,_184,_166,_0.02)] max-[480px]:[border-radius:14px]">
 
-<div className="details-gallery">
+<div className="details-gallery [width:100%] [background:#0f172a]">
 
-<div className="details-main-image">
+<div className="details-main-image [position:relative] [width:100%] [height:480px] [overflow:hidden] [background:linear-gradient(_135deg,_#134e4a,_#0f172a_)] [&>_img]:[width:100%] [&>_img]:[height:100%] [&>_img]:[display:block] [&>_img]:[object-fit:cover] [&>_img]:[transition:transform_0.5s_ease] [&:hover_>_img]:[transform:scale(1.015)] after:[content:''] after:[position:absolute] after:[inset:auto_0_0_0] after:[height:120px] after:[pointer-events:none] after:[background:linear-gradient(_to_top,_rgba(2,_6,_23,_0.65),_transparent_)] max-[900px]:[height:400px] max-[768px]:[height:340px] max-[480px]:[height:250px]">
 
 {hasImages ? (
 <>
@@ -721,7 +719,7 @@ selectedImage + 1
 }`}
 />
 
-<span className="property-type-badge">
+<span className="property-type-badge [position:absolute] [top:14px] [right:14px] [padding:7px_12px] [background:rgba(11,_17,_32,_0.88)] [border:1px_solid_#334155] [border-radius:999px] [color:#2dd4bf] [font-size:12px] [font-weight:700] [backdrop-filter:blur(8px)] max-[400px]:[top:12px] max-[400px]:[right:12px] max-[400px]:[padding:6px_9px] [z-index:2] [top:20px] [right:20px] [padding:9px_16px] [border:1px_solid_rgba(94,_234,_212,_0.28)] [background:rgba(15,_23,_42,_0.88)] [backdrop-filter:blur(10px)] [color:#5eead4] [font-size:13px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.3)] max-[768px]:[top:14px] max-[768px]:[right:14px] max-[480px]:[top:10px] max-[480px]:[right:10px] max-[480px]:[padding:7px_11px] max-[480px]:[font-size:12px]">
 {property.propertyType}
 </span>
 
@@ -729,7 +727,7 @@ selectedImage + 1
 <>
 <button
 type="button"
-className="gallery-arrow gallery-arrow-left"
+className="gallery-arrow gallery-arrow-left [position:absolute] [z-index:3] [top:50%] [transform:translateY(-50%)] [width:48px] [height:48px] [display:flex] [align-items:center] [justify-content:center] [border:1px_solid_rgba(148,_163,_184,_0.35)] [border-radius:50%] [background:rgba(15,_23,_42,_0.78)] [backdrop-filter:blur(8px)] [color:#f8fafc] [font-size:32px] [line-height:1] [cursor:pointer] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.3)] [transition:background_0.2s_ease,_border-color_0.2s_ease,_color_0.2s_ease,_transform_0.2s_ease] hover:[background:#0f766e] hover:[border-color:#2dd4bf] hover:[color:white] max-[768px]:[width:42px] max-[768px]:[height:42px] max-[768px]:[font-size:28px] max-[480px]:[width:36px] max-[480px]:[height:36px] max-[480px]:[font-size:24px] [left:20px] max-[768px]:[left:12px] max-[480px]:[left:8px]"
 onClick={
 showPreviousImage
 }
@@ -740,7 +738,7 @@ aria-label="Previous image"
 
 <button
 type="button"
-className="gallery-arrow gallery-arrow-right"
+className="gallery-arrow gallery-arrow-right [position:absolute] [z-index:3] [top:50%] [transform:translateY(-50%)] [width:48px] [height:48px] [display:flex] [align-items:center] [justify-content:center] [border:1px_solid_rgba(148,_163,_184,_0.35)] [border-radius:50%] [background:rgba(15,_23,_42,_0.78)] [backdrop-filter:blur(8px)] [color:#f8fafc] [font-size:32px] [line-height:1] [cursor:pointer] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.3)] [transition:background_0.2s_ease,_border-color_0.2s_ease,_color_0.2s_ease,_transform_0.2s_ease] hover:[background:#0f766e] hover:[border-color:#2dd4bf] hover:[color:white] max-[768px]:[width:42px] max-[768px]:[height:42px] max-[768px]:[font-size:28px] max-[480px]:[width:36px] max-[480px]:[height:36px] max-[480px]:[font-size:24px] [right:20px] max-[768px]:[right:12px] max-[480px]:[right:8px]"
 onClick={
 showNextImage
 }
@@ -749,7 +747,7 @@ aria-label="Next image"
 ›
 </button>
 
-<div className="image-counter">
+<div className="image-counter [position:absolute] [z-index:3] [bottom:18px] [right:20px] [padding:7px_12px] [border:1px_solid_rgba(148,_163,_184,_0.2)] [border-radius:999px] [background:rgba(2,_6,_23,_0.72)] [backdrop-filter:blur(8px)] [color:#f8fafc] [font-size:12px] [font-weight:700] max-[480px]:[right:10px] max-[480px]:[bottom:10px]">
 {selectedImage + 1} /{" "}
 {images.length}
 </div>
@@ -758,8 +756,8 @@ aria-label="Next image"
 </>
 ) : (
 <>
-<div className="no-image-placeholder">
-<span className="no-image-icon">
+<div className="no-image-placeholder [width:100%] [height:100%] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:12px] [background:radial-gradient(_circle,_rgba(20,_184,_166,_0.08),_transparent_55%_)] [color:#64748b] [font-size:15px] [font-weight:600]">
+<span className="no-image-icon [font-size:58px] [opacity:0.8]">
 🏠
 </span>
 
@@ -768,7 +766,7 @@ No property image
 </span>
 </div>
 
-<span className="property-type-badge">
+<span className="property-type-badge [position:absolute] [top:14px] [right:14px] [padding:7px_12px] [background:rgba(11,_17,_32,_0.88)] [border:1px_solid_#334155] [border-radius:999px] [color:#2dd4bf] [font-size:12px] [font-weight:700] [backdrop-filter:blur(8px)] max-[400px]:[top:12px] max-[400px]:[right:12px] max-[400px]:[padding:6px_9px] [z-index:2] [top:20px] [right:20px] [padding:9px_16px] [border:1px_solid_rgba(94,_234,_212,_0.28)] [background:rgba(15,_23,_42,_0.88)] [backdrop-filter:blur(10px)] [color:#5eead4] [font-size:13px] [box-shadow:0_8px_25px_rgba(0,_0,_0,_0.3)] max-[768px]:[top:14px] max-[768px]:[right:14px] max-[480px]:[top:10px] max-[480px]:[right:10px] max-[480px]:[padding:7px_11px] max-[480px]:[font-size:12px]">
 {property.propertyType}
 </span>
 </>
@@ -777,7 +775,7 @@ No property image
 </div>
 
 {images.length > 1 && (
-<div className="image-thumbnails">
+<div className="image-thumbnails [display:flex] [gap:10px] [padding:14px_16px] [overflow-x:auto] [background:#0f172a] [border-top:1px_solid_#273449] [scrollbar-width:thin] [scrollbar-color:#334155_transparent]">
 
 {images.map(
 (image, index) => (
@@ -788,7 +786,7 @@ image._id ||
 image.publicId ||
 index
 }
-className={`image-thumbnail ${
+className={`image-thumbnail [flex:0_0_88px] [width:88px] [height:68px] [padding:0] [overflow:hidden] [border:2px_solid_transparent] [border-radius:10px] [background:#1e293b] [cursor:pointer] [opacity:0.55] [transition:opacity_0.2s_ease,_border-color_0.2s_ease,_transform_0.2s_ease] hover:[opacity:0.9] hover:[transform:translateY(-2px)] [&.active]:[opacity:1] [&.active]:[border-color:#14b8a6] [&.active]:[box-shadow:0_0_0_2px_rgba(20,_184,_166,_0.12)] [&_img]:[width:100%] [&_img]:[height:100%] [&_img]:[display:block] [&_img]:[object-fit:cover] max-[480px]:[flex-basis:70px] max-[480px]:[width:70px] max-[480px]:[height:55px] ${
 selectedImage === index
 ? "active"
 : ""
@@ -816,9 +814,9 @@ index + 1
 
 </div>
 
-<div className="details-content">
+<div className="details-content [padding:38px] [&_section]:[margin-top:34px] [&_h2]:[margin:0_0_14px] [&_h2]:[color:#f8fafc] [&_h2]:[font-size:21px] [&_h2]:[font-weight:750] [&_h2]:[letter-spacing:-0.2px] max-[768px]:[padding:28px] max-[650px]:[padding:22px] max-[480px]:[padding:18px]">
 
-<div className="details-title">
+<div className="details-title [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:30px] [&_h1]:[margin:0_0_10px] [&_h1]:[color:#f8fafc] [&_h1]:[font-size:34px] [&_h1]:[line-height:1.2] [&_h1]:[font-weight:800] [&_h1]:[letter-spacing:-0.5px] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px] [&_p]:[line-height:1.6] max-[768px]:[&_h1]:[font-size:28px] max-[768px]:[gap:18px] max-[650px]:[flex-direction:column] max-[480px]:[&_h1]:[font-size:24px] max-[480px]:[&_p]:[font-size:13px]">
 
 <div>
 
@@ -835,7 +833,7 @@ index + 1
 
 </div>
 
-<div className="details-price">
+<div className="details-price [flex-shrink:0] [color:#5eead4] [font-size:30px] [line-height:1] [font-weight:800] [white-space:nowrap] [&_small]:[color:#94a3b8] [&_small]:[font-size:13px] [&_small]:[font-weight:400] max-[768px]:[font-size:26px] max-[650px]:[font-size:24px]">
 ₹{property.rent}
 
 <small>
@@ -846,9 +844,9 @@ index + 1
 
 </div>
 
-<div className="property-rating-summary">
+<div className="property-rating-summary [display:flex] [align-items:center] [flex-wrap:wrap] [gap:14px] [margin:22px_0_26px] [padding:15px_18px] [border:1px_solid_#273449] [border-radius:12px] [background:linear-gradient(_135deg,_#111827,_#0f172a_)] max-[650px]:[gap:10px]">
 
-<div className="rating-summary-stars">
+<div className="rating-summary-stars [display:flex] [align-items:center]">
 
 {renderStars(
 Math.round(
@@ -858,7 +856,7 @@ averageRating
 
 </div>
 
-<div className="rating-summary-value">
+<div className="rating-summary-value [display:flex] [align-items:baseline] [gap:3px] [&_strong]:[color:#f8fafc] [&_strong]:[font-size:24px] [&_span]:[color:#94a3b8] [&_span]:[font-size:13px]">
 
 <strong>
 {averageRating.toFixed(1)}
@@ -870,7 +868,7 @@ averageRating
 
 </div>
 
-<div className="rating-summary-count">
+<div className="rating-summary-count [color:#94a3b8] [font-size:13px]">
 
 {reviewCount === 1
 ? "1 review"
@@ -881,11 +879,11 @@ averageRating
 </div>
 
 {user?.role === "seeker" && (
-<div className="details-favorite-wrapper">
+<div className="details-favorite-wrapper [display:flex] [align-items:center] [margin:20px_0_26px] max-[480px]:[width:100%]">
 
 <button
 type="button"
-className={`details-favorite-button ${
+className={`details-favorite-button [display:inline-flex] [align-items:center] [justify-content:center] [gap:10px] [min-width:215px] [padding:12px_20px] [border:1px_solid_#334155] [border-radius:10px] [background:#1e293b] [color:#cbd5e1] [font-size:14px] [font-weight:600] [cursor:pointer] [transition:background_0.2s_ease,_border-color_0.2s_ease,_color_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] [&_span]:[font-size:23px] [&_span]:[line-height:1] hover:[background:#273449] hover:[border-color:#14b8a6] hover:[color:#5eead4] hover:[transform:translateY(-2px)] hover:[box-shadow:0_8px_20px_rgba(0,_0,_0,_0.25)] disabled:[opacity:0.6] disabled:[cursor:not-allowed] disabled:[transform:none] max-[480px]:[width:100%] ${
 isFavorite
 ? "details-favorite-active"
 : ""
@@ -915,7 +913,7 @@ favoriteLoading
 </div>
 )}
 
-<div className="details-grid">
+<div className="details-grid [display:grid] [grid-template-columns:repeat(5,_1fr)] [gap:12px] [margin:30px_0] [padding:18px_0] [border-top:1px_solid_#273449] [border-bottom:1px_solid_#273449] [&_div]:[min-height:72px] [&_div]:[display:flex] [&_div]:[flex-direction:column] [&_div]:[justify-content:center] [&_div]:[gap:7px] [&_div]:[padding:14px] [&_div]:[border:1px_solid_rgba(51,_65,_85,_0.7)] [&_div]:[border-radius:10px] [&_div]:[background:rgba(15,_23,_42,_0.7)] [&_div]:[transition:border-color_0.2s_ease,_transform_0.2s_ease] [&_div:hover]:[border-color:rgba(20,_184,_166,_0.45)] [&_div:hover]:[transform:translateY(-2px)] [&_span]:[color:#64748b] [&_span]:[font-size:11px] [&_span]:[font-weight:600] [&_span]:[text-transform:uppercase] [&_span]:[letter-spacing:0.5px] [&_strong]:[color:#e2e8f0] [&_strong]:[font-size:14px] max-[900px]:[grid-template-columns:repeat(3,_1fr)] max-[650px]:[grid-template-columns:repeat(2,_1fr)] max-[480px]:[grid-template-columns:1fr_1fr] max-[480px]:[gap:8px] max-[480px]:[&_div]:[padding:11px] max-[480px]:[&_div]:[min-height:64px] max-[480px]:[&_strong]:[font-size:13px]">
 
 <div>
 <span>
@@ -976,7 +974,7 @@ rooms
 About this place
 </h2>
 
-<p className="details-description">
+<p className="details-description [margin:0] [color:#94a3b8] [line-height:1.8] [font-size:15px]">
 {property.description}
 </p>
 
@@ -988,7 +986,7 @@ About this place
 Amenities
 </h2>
 
-<div className="amenities">
+<div className="amenities [display:grid] [grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:10px] [&_span]:[display:flex] [&_span]:[align-items:center] [&_span]:[min-height:42px] [&_span]:[padding:10px_13px] [&_span]:[border:1px_solid_rgba(45,_212,_191,_0.14)] [&_span]:[border-radius:9px] [&_span]:[background:rgba(20,_184,_166,_0.07)] [&_span]:[color:#cbd5e1] [&_span]:[font-size:13px] [&_span]:[font-weight:500] [&_span]:[transition:background_0.2s_ease,_border-color_0.2s_ease,_transform_0.2s_ease] [&_span:hover]:[background:rgba(20,_184,_166,_0.12)] [&_span:hover]:[border-color:rgba(45,_212,_191,_0.28)] [&_span:hover]:[transform:translateY(-2px)] max-[900px]:[grid-template-columns:repeat(2,_1fr)] max-[650px]:[grid-template-columns:1fr]">
 
 {property.amenities?.length >
 0 ? (
@@ -1029,7 +1027,7 @@ House rules
 {property.rules?.length >
 0 ? (
 
-<ul className="rules">
+<ul className="rules [margin:0] [padding:16px_18px_16px_36px] [border:1px_solid_#273449] [border-radius:12px] [background:#0f172a] [color:#94a3b8] [line-height:1.9] [&_li]:[padding:3px_0] [&_li::marker]:[color:#14b8a6]">
 
 {property.rules.map(
 (
@@ -1221,7 +1219,7 @@ referrerPolicy="no-referrer-when-downgrade"
 
 {property.owner && (
 
-<section className="owner-section">
+<section className="owner-section [padding:22px] [border:1px_solid_#273449] [border-radius:14px] [background:linear-gradient(_135deg,_#111827,_#0f172a_)] [&_h2]:[margin:0_0_14px] [&_h2]:[color:#f8fafc] [&_p]:[margin:6px_0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px] [&_strong]:[color:#f8fafc] [&_strong]:[font-size:16px] max-[480px]:[padding:18px]">
 
 <h2>
 Listed by
@@ -1247,14 +1245,14 @@ Listed by
   <>
     <Link
       to={"/properties/" + id + "/book"}
-      className="inquiry-btn"
+      className="inquiry-btn [width:100%] [max-width:360px] [display:block] [margin:16px_auto_0] [padding:13px_18px] [border:none] [border-radius:10px] [background:linear-gradient(_135deg,_#0d9488,_#14b8a6_)] [color:#ffffff] [font-size:15px] [font-weight:700] [cursor:pointer] [box-shadow:0_8px_24px_rgba(20,_184,_166,_0.12)] [transition:transform_0.2s_ease,_box-shadow_0.2s_ease,_filter_0.2s_ease] hover:[transform:translateY(-2px)] hover:[filter:brightness(1.06)] hover:[box-shadow:0_12px_30px_rgba(20,_184,_166,_0.2)]"
       style={{ display: "block", textAlign: "center", textDecoration: "none" }}
     >
       Book this PG
     </Link>
 
     <button
-      className="inquiry-btn"
+      className="inquiry-btn [width:100%] [max-width:360px] [display:block] [margin:16px_auto_0] [padding:13px_18px] [border:none] [border-radius:10px] [background:linear-gradient(_135deg,_#0d9488,_#14b8a6_)] [color:#ffffff] [font-size:15px] [font-weight:700] [cursor:pointer] [box-shadow:0_8px_24px_rgba(20,_184,_166,_0.12)] [transition:transform_0.2s_ease,_box-shadow_0.2s_ease,_filter_0.2s_ease] hover:[transform:translateY(-2px)] hover:[filter:brightness(1.06)] hover:[box-shadow:0_12px_30px_rgba(20,_184,_166,_0.2)]"
       type="button"
       onClick={handleOpenInquiry}
     >
@@ -1264,9 +1262,9 @@ Listed by
 )}
 {showInquiryForm && (
 
-<div className="inquiry-form-wrapper">
+<div className="inquiry-form-wrapper [margin-top:28px] [padding:26px] [border:1px_solid_#273449] [border-radius:14px] [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [box-shadow:0_12px_35px_rgba(0,_0,_0,_0.25)] max-[650px]:[padding:20px] max-[480px]:[padding:16px]">
 
-<div className="inquiry-form-header">
+<div className="inquiry-form-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:20px] [margin-bottom:22px] [&_h2]:[margin:0_0_6px] [&_h2]:[color:#f8fafc] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px]">
 
 <div>
 
@@ -1283,7 +1281,7 @@ this property.
 
 <button
 type="button"
-className="inquiry-close-button"
+className="inquiry-close-button [flex-shrink:0] [width:35px] [height:35px] [border:1px_solid_#334155] [border-radius:50%] [background:#1e293b] [color:#cbd5e1] [font-size:23px] [line-height:1] [cursor:pointer] [transition:background_0.2s_ease,_border-color_0.2s_ease] hover:[background:#334155] hover:[border-color:#475569]"
 onClick={
 handleCloseInquiry
 }
@@ -1298,7 +1296,7 @@ inquiryLoading
 
 {inquirySuccess && (
 
-<div className="inquiry-success">
+<div className="inquiry-success [padding:12px_14px] [margin-bottom:18px] [border-radius:9px] [font-size:14px] [border:1px_solid_rgba(45,_212,_191,_0.2)] [background:rgba(20,_184,_166,_0.1)] [color:#5eead4]">
 {inquirySuccess}
 </div>
 
@@ -1306,7 +1304,7 @@ inquiryLoading
 
 {inquiryError && (
 
-<div className="inquiry-error">
+<div className="inquiry-error [padding:12px_14px] [margin-bottom:18px] [border-radius:9px] [font-size:14px] [border:1px_solid_rgba(248,_113,_113,_0.2)] [background:rgba(239,_68,_68,_0.1)] [color:#f87171]">
 {inquiryError}
 </div>
 
@@ -1315,13 +1313,13 @@ inquiryLoading
 {!inquirySuccess && (
 
 <form
-className="inquiry-form"
+className="inquiry-form [display:flex] [flex-direction:column] [gap:20px]"
 onSubmit={
 handleSendInquiry
 }
 >
 
-<div className="inquiry-field">
+<div className="inquiry-field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:#e2e8f0] [&_label]:[font-size:13px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[box-sizing:border-box] [&_input]:[padding:13px_14px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[outline:none] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-family:inherit] [&_input]:[font-size:14px] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_textarea]:[width:100%] [&_textarea]:[box-sizing:border-box] [&_textarea]:[padding:13px_14px] [&_textarea]:[border:1px_solid_#334155] [&_textarea]:[border-radius:9px] [&_textarea]:[outline:none] [&_textarea]:[background:#0f172a] [&_textarea]:[color:#f8fafc] [&_textarea]:[font-family:inherit] [&_textarea]:[font-size:14px] [&_textarea]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_textarea::placeholder]:[color:#64748b] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[background:#101b2e] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.1)] [&_textarea:focus]:[border-color:#14b8a6] [&_textarea:focus]:[background:#101b2e] [&_textarea:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.1)] [&_textarea]:[min-height:140px] [&_textarea]:[resize:vertical] [&_small]:[align-self:flex-end] [&_small]:[color:#64748b] [&_small]:[font-size:12px]">
 
 <label htmlFor="moveInDate">
 Preferred Move-in Date
@@ -1347,7 +1345,7 @@ event.target.value
 
 </div>
 
-<div className="inquiry-field">
+<div className="inquiry-field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:#e2e8f0] [&_label]:[font-size:13px] [&_label]:[font-weight:600] [&_input]:[width:100%] [&_input]:[box-sizing:border-box] [&_input]:[padding:13px_14px] [&_input]:[border:1px_solid_#334155] [&_input]:[border-radius:9px] [&_input]:[outline:none] [&_input]:[background:#0f172a] [&_input]:[color:#f8fafc] [&_input]:[font-family:inherit] [&_input]:[font-size:14px] [&_input]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_textarea]:[width:100%] [&_textarea]:[box-sizing:border-box] [&_textarea]:[padding:13px_14px] [&_textarea]:[border:1px_solid_#334155] [&_textarea]:[border-radius:9px] [&_textarea]:[outline:none] [&_textarea]:[background:#0f172a] [&_textarea]:[color:#f8fafc] [&_textarea]:[font-family:inherit] [&_textarea]:[font-size:14px] [&_textarea]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease,_background_0.2s_ease] [&_input::placeholder]:[color:#64748b] [&_textarea::placeholder]:[color:#64748b] [&_input:focus]:[border-color:#14b8a6] [&_input:focus]:[background:#101b2e] [&_input:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.1)] [&_textarea:focus]:[border-color:#14b8a6] [&_textarea:focus]:[background:#101b2e] [&_textarea:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.1)] [&_textarea]:[min-height:140px] [&_textarea]:[resize:vertical] [&_small]:[align-self:flex-end] [&_small]:[color:#64748b] [&_small]:[font-size:12px]">
 
 <label htmlFor="message">
 Message *
@@ -1375,7 +1373,7 @@ required
 
 <button
 type="submit"
-className="inquiry-submit-button"
+className="inquiry-submit-button [align-self:flex-start] [padding:12px_24px] [border:none] [border-radius:9px] [background:#0d9488] [color:#ffffff] [font-size:14px] [font-weight:700] [cursor:pointer] [transition:background_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] hover:[background:#14b8a6] hover:[transform:translateY(-1px)] hover:[box-shadow:0_8px_20px_rgba(20,_184,_166,_0.15)] disabled:[opacity:0.65] disabled:[cursor:not-allowed] disabled:[transform:none] max-[650px]:[width:100%] max-[650px]:[align-self:stretch]"
 disabled={
 inquiryLoading
 }
@@ -1395,9 +1393,9 @@ inquiryLoading
 
 )}
 
-<section className="reviews-section">
+<section className="reviews-section [margin-top:48px] [padding-top:34px] [border-top:1px_solid_#273449]">
 
-<div className="reviews-section-header">
+<div className="reviews-section-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:24px] [margin-bottom:24px] [&_h2]:[margin:0_0_7px] [&_h2]:[color:#f8fafc] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px] max-[768px]:[flex-direction:column]">
 
 <div>
 
@@ -1414,7 +1412,7 @@ say about this property.
 
 {reviewCount > 0 && (
 
-<div className="reviews-header-rating">
+<div className="reviews-header-rating [display:flex] [align-items:center] [gap:12px] [padding:11px_15px] [border:1px_solid_#273449] [border-radius:10px] [background:#111827] [&>_strong]:[color:#f8fafc] [&>_strong]:[font-size:26px] [&>_div]:[display:flex] [&>_div]:[flex-direction:column] [&>_div]:[gap:3px] [&_span]:[color:#94a3b8] [&_span]:[font-size:12px] max-[768px]:[width:fit-content]">
 
 <strong>
 {averageRating.toFixed(1)}
@@ -1446,7 +1444,7 @@ averageRating
 
 {reviewError && (
 
-<div className="review-error">
+<div className="review-error [margin-bottom:20px] [padding:12px_14px] [border:1px_solid_rgba(248,_113,_113,_0.2)] [border-radius:9px] [background:rgba(239,_68,_68,_0.1)] [color:#f87171] [font-size:14px]">
 {reviewError}
 </div>
 
@@ -1455,7 +1453,7 @@ averageRating
 {isAuthenticated &&
 user?.role === "seeker" && (
 
-<div className="review-form-wrapper">
+<div className="review-form-wrapper [margin-bottom:30px] [padding:26px] [border:1px_solid_#273449] [border-radius:14px] [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [box-shadow:0_10px_30px_rgba(0,_0,_0,_0.2)] [&_h3]:[margin:0_0_6px] [&_h3]:[color:#f8fafc] [&>_p]:[margin:0_0_22px] [&>_p]:[color:#94a3b8] [&>_p]:[font-size:14px] max-[650px]:[padding:20px] max-[480px]:[padding:16px]">
 
 <h3>
 Share your experience
@@ -1468,19 +1466,19 @@ seekers.
 </p>
 
 <form
-className="review-form"
+className="review-form [display:flex] [flex-direction:column] [gap:20px]"
 onSubmit={
 handleSubmitReview
 }
 >
 
-<div className="review-rating-field">
+<div className="review-rating-field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:#e2e8f0] [&_label]:[font-size:13px] [&_label]:[font-weight:600]">
 
 <label>
 Your Rating
 </label>
 
-<div className="rating-selector">
+<div className="rating-selector [display:flex] [align-items:center] [gap:4px]">
 
 {[1, 2, 3, 4, 5].map(
 (star) => (
@@ -1513,7 +1511,7 @@ aria-label={`Rate ${star} out of 5`}
 
 </div>
 
-<div className="review-comment-field">
+<div className="review-comment-field [display:flex] [flex-direction:column] [gap:8px] [&_label]:[color:#e2e8f0] [&_label]:[font-size:13px] [&_label]:[font-weight:600] [&_textarea]:[width:100%] [&_textarea]:[box-sizing:border-box] [&_textarea]:[padding:13px_14px] [&_textarea]:[border:1px_solid_#334155] [&_textarea]:[border-radius:9px] [&_textarea]:[outline:none] [&_textarea]:[background:#0f172a] [&_textarea]:[color:#f8fafc] [&_textarea]:[font-family:inherit] [&_textarea]:[font-size:14px] [&_textarea]:[resize:vertical] [&_textarea]:[transition:border-color_0.2s_ease,_box-shadow_0.2s_ease] [&_textarea::placeholder]:[color:#64748b] [&_textarea:focus]:[border-color:#14b8a6] [&_textarea:focus]:[box-shadow:0_0_0_3px_rgba(20,_184,_166,_0.1)] [&_small]:[align-self:flex-end] [&_small]:[color:#64748b] [&_small]:[font-size:12px]">
 
 <label htmlFor="reviewComment">
 Your Review
@@ -1542,7 +1540,7 @@ maxLength="1000"
 
 <button
 type="submit"
-className="review-submit-button"
+className="review-submit-button [align-self:flex-start] [padding:12px_22px] [border:none] [border-radius:9px] [background:#0d9488] [color:#ffffff] [font-size:14px] [font-weight:700] [cursor:pointer] [transition:background_0.2s_ease,_transform_0.2s_ease,_box-shadow_0.2s_ease] hover:[background:#14b8a6] hover:[transform:translateY(-1px)] hover:[box-shadow:0_8px_20px_rgba(20,_184,_166,_0.15)] disabled:[opacity:0.65] disabled:[cursor:not-allowed] disabled:[transform:none] max-[650px]:[width:100%] max-[650px]:[align-self:stretch]"
 disabled={
 reviewSubmitting
 }
@@ -1560,19 +1558,19 @@ reviewSubmitting
 
 )}
 
-<div className="reviews-list">
+<div className="reviews-list [display:flex] [flex-direction:column] [gap:14px]">
 
 {reviewsLoading ? (
 
-<div className="reviews-state">
+<div className="reviews-state [padding:30px] [text-align:center] [color:#94a3b8]">
 Loading reviews...
 </div>
 
 ) : reviews.length === 0 ? (
 
-<div className="reviews-empty">
+<div className="reviews-empty [padding:40px_20px] [text-align:center] [border:1px_solid_#273449] [border-radius:12px] [background:#111827] [&_h3]:[margin:0_0_6px] [&_h3]:[color:#f8fafc] [&_p]:[margin:0] [&_p]:[color:#94a3b8] [&_p]:[font-size:14px]">
 
-<div className="reviews-empty-icon">
+<div className="reviews-empty-icon [width:48px] [height:48px] [margin:0_auto_12px] [display:flex] [align-items:center] [justify-content:center] [border-radius:50%] [background:rgba(245,_158,_11,_0.1)] [color:#f59e0b] [font-size:24px]">
 ★
 </div>
 
@@ -1594,11 +1592,11 @@ reviews.map(
 (review) => (
 
 <article
-className="review-card"
+className="review-card [padding:20px] [border:1px_solid_#273449] [border-radius:12px] [background:linear-gradient(_145deg,_#111827,_#0f172a_)] [transition:border-color_0.2s_ease,_transform_0.2s_ease] hover:[border-color:#334155] hover:[transform:translateY(-1px)]"
 key={review._id}
 >
 
-<div className="review-card-header">
+<div className="review-card-header [display:flex] [align-items:flex-start] [justify-content:space-between] [gap:16px] [&_h3]:[margin:0_0_7px] [&_h3]:[color:#f8fafc] [&_h3]:[font-size:16px] max-[650px]:[flex-direction:column]">
 
 <div>
 
@@ -1607,7 +1605,7 @@ key={review._id}
 "Seeker"}
 </h3>
 
-<div className="review-card-meta">
+<div className="review-card-meta [display:flex] [align-items:center] [gap:10px] [&_span]:[color:#94a3b8] [&_span]:[font-size:12px]">
 
 {renderStars(
 review.rating
@@ -1630,7 +1628,7 @@ review.seeker?._id && (
 
 <button
 type="button"
-className="delete-review-button"
+className="delete-review-button [padding:7px_12px] [border:1px_solid_#7f1d1d] [border-radius:7px] [background:rgba(239,_68,_68,_0.08)] [color:#f87171] [font-size:12px] [font-weight:600] [cursor:pointer] [transition:background_0.2s_ease,_border-color_0.2s_ease] hover:[background:rgba(239,_68,_68,_0.15)] hover:[border-color:#991b1b] disabled:[opacity:0.6] disabled:[cursor:not-allowed] max-[650px]:[align-self:flex-start]"
 onClick={() =>
 handleDeleteReview(
 review._id
@@ -1653,7 +1651,7 @@ review._id
 
 </div>
 
-<p className="review-comment">
+<p className="review-comment [margin:14px_0_0] [color:#cbd5e1] [font-size:14px] [line-height:1.7] [white-space:pre-wrap]">
 {review.comment}
 </p>
 

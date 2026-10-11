@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const Booking = require("../models/Booking");
 const Property = require("../models/Property");
-const { sendBookingConfirmation } = require("../utils/emailService");
 
 const getTokenAmount = () => {
   const amount = Number(process.env.BOOKING_TOKEN_AMOUNT_INR);
@@ -292,40 +291,8 @@ const verifyBookingPayment = async (req, res) => {
       return res.status(409).json({ message: "Unable to finalize the booking. Contact support with your payment ID." });
     }
 
-    let emailSent = false;
-    let emailError = "";
-
-    try {
-      const [seeker, owner] = await Promise.all([
-        require("../models/User").findById(confirmedBooking.seeker).select("name email"),
-        require("../models/User").findById(confirmedBooking.owner).select("name email"),
-      ]);
-
-      const emailResult = await sendBookingConfirmation({
-        booking: confirmedBooking,
-        property: confirmedBooking.property,
-        seeker,
-        owner,
-      });
-
-      emailSent = emailResult.allAccepted;
-      await Booking.updateOne(
-        { _id: confirmedBooking._id },
-        { $set: { confirmationEmailSent: emailSent, confirmationEmailError: emailSent ? "" : "SMTP did not accept every recipient." } }
-      );
-    } catch (mailError) {
-      emailError = mailError.message;
-      await Booking.updateOne(
-        { _id: confirmedBooking._id },
-        { $set: { confirmationEmailError: emailError } }
-      );
-      console.error("Booking confirmation email error:", emailError);
-    }
-
     return res.status(200).json({
-      message: emailSent
-        ? "Payment verified. Your booking is confirmed. The mail server accepted the confirmation for all recipients; inbox delivery is not confirmed."
-        : "Payment verified and booking confirmed. The mail server did not accept the confirmation for every recipient; please contact support.",
+      message: "Payment verified and booking confirmed.",
       booking: {
         _id: confirmedBooking._id,
         status: confirmedBooking.status,
@@ -333,9 +300,7 @@ const verifyBookingPayment = async (req, res) => {
         currency: confirmedBooking.currency,
         moveInDate: confirmedBooking.moveInDate,
         property: confirmedBooking.property,
-        confirmationEmailSent: emailSent,
       },
-      emailError: emailSent ? "" : emailError,
     });
   } catch (error) {
     console.error("Verify booking payment error:", error.message);

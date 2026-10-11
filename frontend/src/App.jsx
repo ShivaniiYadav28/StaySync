@@ -32,7 +32,6 @@ import RoommateRequests from "./pages/RoommateRequests";
 
 import EditProperty from "./pages/EditProperty";
 
-import "./App.css";
 
 function App() {
   return (
