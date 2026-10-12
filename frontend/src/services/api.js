@@ -1,9 +1,21 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
 });
+
+// Log only request metadata in development. Axios errors include request
+// configuration and headers, which can contain the user's access token.
+export const logApiError = (label, error) => {
+  if (!import.meta.env.DEV) return;
+
+  console.error(label, {
+    message: error?.message,
+    status: error?.response?.status,
+    url: error?.config?.url,
+  });
+};
 
 api.interceptors.request.use(
   (config) => {
@@ -82,8 +94,8 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/refresh",
+      const response = await api.post(
+        "/auth/refresh",
         {},
         {
           withCredentials: true,

@@ -8,7 +8,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-import api from "../services/api";
+import api, { logApiError } from "../services/api";
 
 function Properties() {
 
@@ -144,10 +144,7 @@ function Properties() {
 
     } catch (error) {
 
-      console.error(
-        "Fetch favorites error:",
-        error
-      );
+      logApiError("Fetch favorites error:", error);
 
     }
   };
@@ -327,10 +324,7 @@ function Properties() {
 
     } catch (error) {
 
-      console.error(
-        "Fetch properties error:",
-        error
-      );
+      logApiError("Fetch properties error:", error);
 
 
       setError(

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import api from "../services/api";
+import api, { logApiError } from "../services/api";
 import { useAuth } from "../context/useAuth";
 
 function Favorites() {
@@ -42,7 +42,7 @@ function Favorites() {
           );
         }
       } catch (error) {
-        console.error(error);
+        logApiError("Fetch favorites error:", error);
 
         if (isMounted) {
           setError(
